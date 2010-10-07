@@ -1,0 +1,5 @@
+relre:resources/*
+relre:target/*
+.classpath
+.project
+.settings
