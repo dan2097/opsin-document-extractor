@@ -16,14 +16,28 @@ public class ActivityExtractor {
 	static {
 		activityTypes = new ArrayList<String>();
 		activityTypes.add("Ki");
+		activityTypes.add("IC50");
+		activityTypes.add("EC50");
 	}
+	static List<String> compoundColumn;
+	static {
+		compoundColumn = new ArrayList<String>();
+		compoundColumn.add("cp");
+		compoundColumn.add("compd");
+		compoundColumn.add("compound");
+		compoundColumn.add("id");
+		compoundColumn.add("ident");
+		compoundColumn.add("identifier");
+	}
+	
 	public static List<NameActivityPair> extractNameActivityTypeActivityValueTuples(Document doc){
 		List<NameActivityPair> naps = new ArrayList<NameActivityPair>();
 		List<Element> tables = XOMTools.getDescendantElementsWithTagName(doc.getRootElement(), "table");
 		for (Element table : tables) {
 			List<Element> theads = XOMTools.getChildElementsWithTagName(table, "thead");
 			if (theads.size()==1){
-				List<String> compoundNames = extractNamesInColumn(table, 0);
+				int compoundIdenfifierColumn = determineIdentifierColumn(theads.get(0));
+				List<String> compoundNames = extractNamesInColumn(table, compoundIdenfifierColumn);
 				Map<Integer, String> columnToActivityType = determineColumnToActivityTypeMapping(theads.get(0));
 				naps.addAll(extactsNameActivityPairs(columnToActivityType, compoundNames, table));
 			}
@@ -44,6 +58,29 @@ public class ActivityExtractor {
 			}
 		}
 		return compoundNames;
+	}
+	
+	/**
+	 * Checks the column names for recognised identifier columns.
+	 * Returns the indice of the column that contains the identifier
+	 * or 0 if not able to determine.
+	 * @param thead
+	 * @return
+	 */
+	private static int determineIdentifierColumn(Element thead) {
+		List<Element> rows = XOMTools.getChildElementsWithTagName(thead, "tr");
+		for (Element row : rows) {
+			List<Element> th = XOMTools.getChildElementsWithTagName(row, "th");
+			for (int i = 0; i < th.size(); i++) {
+				String columnValue = th.get(i).getValue();
+				for (String compoundIdentifierColumnName : compoundColumn) {
+					if (columnValue.regionMatches(true, 0, compoundIdentifierColumnName, 0, compoundIdentifierColumnName.length())){
+						return i;
+					}
+				}
+			}
+		}
+		return 0;
 	}
 	
 	private static Map<Integer, String> determineColumnToActivityTypeMapping(Element thead) {
