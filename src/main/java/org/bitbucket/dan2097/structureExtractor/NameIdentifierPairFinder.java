@@ -20,6 +20,7 @@ public class NameIdentifierPairFinder {
 	private final static Pattern matchWhitespace = Pattern.compile("\\s+");
 	private final static Pattern matchComma = Pattern.compile(",[ ]?");
 	private final static Pattern matchCommaedIdentifier = Pattern.compile(",(\\S+),");
+	private final static Pattern matchCommaSemiColonIdentifier = Pattern.compile(",(\\S+);");
 	private final static Pattern matchbracketedIdentifier = Pattern.compile("[\\[{\\(](\\S+?)[\\]}\\)]");
 	private final static Pattern hasDigits = Pattern.compile("[0-9]");
 	
@@ -41,7 +42,7 @@ public class NameIdentifierPairFinder {
 	    	String terminalNonLetter = "";
 	    	if (word.length()>0){
 	    		char lastLetter =word.charAt(word.length()-1);
-		    	if (!Character.isLetter(lastLetter)){
+		    	if (!Character.isLetter(lastLetter)&& lastLetter!=')' && lastLetter!=']' && lastLetter!='}'){
 		    		word = word.substring(0, word.length()-1);
 		    		terminalNonLetter =String.valueOf(lastLetter);
 		    	}
@@ -111,11 +112,23 @@ public class NameIdentifierPairFinder {
 			}
 		}
 		else{
-			m = matchCommaedIdentifier.matcher(nextWord);
-			if (m.lookingAt()){
+			m = matchCommaSemiColonIdentifier.matcher(nextWord);
+			if (m.matches()){
 				String identifier = m.group(1);
 				m = hasDigits.matcher(identifier);
-				if (m.find()){
+				if (m.find() && identifier.length()<15){
+					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.identifier));
+				}
+				else{
+					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.alias));
+				}
+			}
+			
+			m = matchCommaedIdentifier.matcher(nextWord);
+			if (m.matches()){
+				String identifier = m.group(1);
+				m = hasDigits.matcher(identifier);
+				if (m.find() && identifier.length()<15){
 					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.identifier));
 				}
 				else{
