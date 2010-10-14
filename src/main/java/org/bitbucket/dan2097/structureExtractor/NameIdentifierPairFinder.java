@@ -19,9 +19,8 @@ public class NameIdentifierPairFinder {
 	private static ParseRules pr;
 	private final static Pattern matchWhitespace = Pattern.compile("\\s+");
 	private final static Pattern matchComma = Pattern.compile(",[ ]?");
-	private final static Pattern matchCommaedIdentifier = Pattern.compile(",(\\S+),");
-	private final static Pattern matchCommaSemiColonIdentifier = Pattern.compile(",(\\S+);");
-	private final static Pattern matchbracketedIdentifier = Pattern.compile("[\\[{\\(](\\S+?)[\\]}\\)]");
+	private final static Pattern matchDelimitedIdentifier = Pattern.compile("[\\[{\\(,;](\\S+)[,;]");
+	private final static Pattern matchbracketedIdentifier = Pattern.compile("[\\[{\\(](.+?)[\\]}\\)]");
 	private final static Pattern hasDigits = Pattern.compile("[0-9]");
 	
 	static{
@@ -112,19 +111,7 @@ public class NameIdentifierPairFinder {
 			}
 		}
 		else{
-			m = matchCommaSemiColonIdentifier.matcher(nextWord);
-			if (m.matches()){
-				String identifier = m.group(1);
-				m = hasDigits.matcher(identifier);
-				if (m.find() && identifier.length()<15){
-					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.identifier));
-				}
-				else{
-					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.alias));
-				}
-			}
-			
-			m = matchCommaedIdentifier.matcher(nextWord);
+			m = matchDelimitedIdentifier.matcher(nextWord);
 			if (m.matches()){
 				String identifier = m.group(1);
 				m = hasDigits.matcher(identifier);
