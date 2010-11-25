@@ -13,8 +13,23 @@ public class DocumentToStructures {
 	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
 	
 	public static void main(String[] args) throws Exception {
-		String input ="The piperidine derivative compound pyridines according to claim 4, which is (1) 2-(4-(3-cyclopentyloxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid, (2) 2-(4-(3,4-dimethoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid, (3) 2-(4-(3-ethoxy-4-methoxyphenyl-4-cyanopiperidin-1-yl)acetic acid, (4) 2-(4-(3-cyclopropylmethoxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid, (5) 2-(4-(3-isopropyloxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid, (6) 2-(4-(3-cyclobutyloxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid, (7) 2-(4-(3-cyclopentyloxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)propanoic acid; (8) 4-(4-(3-cyclopentyloxy-4-methoxyphenyl)4-cyanopiperidin-1-yl)butanoic acid, (9) 2-(4-(3-cyclopentyloxy-4-methoxyphenyl)-4-cyanopiperidin-1-yl)butanoic acid, (10) 2-(4-(3-cyclopentyloxy-4-difluoromethoxyphenyl)-4-cyanopiperidin-1-yl)acetic acid";
-		extractNames(matchWhiteSpace.split(input));
+		String input ="ethylene glycol, propylene glycol, 1,3- propanediol, 1,2-butanediol, 1,3-butanediol, 1,4-butanediol, 2,3-butanediol, 1,2-pentanediol, 1,5-pentanediol, 1,2-hexanediol, 1,6-hexanediol, 1,2-heptanediol, 1,7-heptanediol, 1,2-octanediol, 1,8-octanediol, 1,2-decanediol, 1,10-decanediol, 3-methyl-1,2-butanediol, 3,3-dimethyl-1,2-butanediol, 4-methyl-1,2-pentanediol, 5-methyl-1,2-hexanediol, 3-chloro- 1,2-propanediol, 3-butene-1,2-diol, 4-pentene-1,2-diol, 1-phenylethane-1,2-diol, 1-(4-methylphenyl)ethane-1,2-diol, 1-(4-methoxyphenyl)ethane-1,2-diol, 1-(4-chlorophenyl)ethane-1,2-diol, 1-(4-nitrophenyl)ethane-1,2-diol, 1-cyclohexylethane- 1,2-diol, 1,2-cyclohexanediol,";
+		List<IdentifiedChemicalName> identifiedNames = extractNames(matchWhiteSpace.split(input));
+		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
+			System.out.println(identifiedChemicalName.getValue());
+		}
+	}
+	
+	/**
+	 * Convenience method:
+	 * Runs the preProcessor over the string, splits on white space then extracts names
+	 * @param sentence
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<IdentifiedChemicalName> extractNames(String sentence) throws Exception{
+		String[] words = matchWhiteSpace.split(PreProcesssor.preProcess(sentence));
+		return extractNames(words);
 	}
 
 	public static List<IdentifiedChemicalName> extractNames(String[] words) throws Exception{
@@ -29,7 +44,7 @@ public class DocumentToStructures {
 				if (!nameBuffer.toString().equals("")){
 					String name =nameBuffer.toString();
 					name= stripUnbalancedTrailingOrLeadingBracket(name);
-					identifiedChemicalNames.add(new IdentifiedChemicalName(i-1-matchWhiteSpace.split(name).length, name));
+					identifiedChemicalNames.add(new IdentifiedChemicalName(i-matchWhiteSpace.split(name).length, name));
 					nameBuffer = "";
 				}
 			}
@@ -40,14 +55,15 @@ public class DocumentToStructures {
 					if (!nameBuffer.equals("")){
 						nameBuffer+=" ";
 					}
-					nameBuffer += StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
-					if (uninterpretableName.indexOf(' ')==-1){
+					String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
+					nameBuffer += parsedOpsinNormalisedText;
+					if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 						i++;
 					}
 					if (followingChar!=null && followingChar !=' '){//encountered punctuation
 						String name =nameBuffer.toString();
 						name= stripUnbalancedTrailingOrLeadingBracket(name);
-						identifiedChemicalNames.add(new IdentifiedChemicalName(i-matchWhiteSpace.split(name).length, name));
+						identifiedChemicalNames.add(new IdentifiedChemicalName(i + 1 -matchWhiteSpace.split(name).length, name));
 						nameBuffer = "";
 					}
 				}
@@ -59,11 +75,8 @@ public class DocumentToStructures {
 		if (!nameBuffer.toString().equals("")){
 			String name =nameBuffer.toString();
 			name= stripUnbalancedTrailingOrLeadingBracket(name);
-			identifiedChemicalNames.add(new IdentifiedChemicalName(wordsLength-1-matchWhiteSpace.split(name).length, name));
+			identifiedChemicalNames.add(new IdentifiedChemicalName(wordsLength - matchWhiteSpace.split(name).length, name));
 		}
-//		for (IdentifiedChemicalName identifiedChemicalName : identifiedChemicalNames) {
-//			System.out.println(identifiedChemicalName.getValue());
-//		}
 		return identifiedChemicalNames;
 	}
 	
