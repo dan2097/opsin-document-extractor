@@ -9,90 +9,57 @@ import org.bitbucket.dan2097.structureExtractor.NameIdentifierPair.IdentifierTyp
 
 import uk.ac.cam.ch.wwmm.opsin.NameToStructure;
 import uk.ac.cam.ch.wwmm.opsin.NameToStructureException;
-import uk.ac.cam.ch.wwmm.opsin.ParseRules;
-import uk.ac.cam.ch.wwmm.opsin.ParseRulesResults;
+import uk.ac.cam.ch.wwmm.opsin.OpsinResult;
 import uk.ac.cam.ch.wwmm.opsin.OpsinResult.OPSIN_RESULT_STATUS;
-import uk.ac.cam.ch.wwmm.oscar3.chemnamedict.ChemNameDictSingleton;
+
 
 public class NameIdentifierPairFinder {
 
-	private static ParseRules pr;
-	private final static Pattern matchWhitespace = Pattern.compile("\\s+");
+	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
 	private final static Pattern matchComma = Pattern.compile(",[ ]?");
 	private final static Pattern matchDelimitedIdentifier = Pattern.compile("[\\[{\\(,;](\\S+)[,;]");
 	private final static Pattern matchbracketedIdentifier = Pattern.compile("[\\[{\\(](.+?)[\\]}\\)]");
 	private final static Pattern hasDigits = Pattern.compile("[0-9]");
+	private final static NameToStructure n2s;
 	
 	static{
-		try {
-			pr = NameToStructure.getOpsinParser();
+		 try {
+			n2s = NameToStructure.getInstance();
 		} catch (NameToStructureException e) {
-			throw new RuntimeException("Unable to intialise OPSIN parser", e);
+			throw new RuntimeException("Unable to initialise OPSIN", e);
 		}
 	}
 	
 	public static List<NameIdentifierPair> extractNameIdentifierPairs(String fullText) throws Exception{
-	    String[] words = matchWhitespace.split(fullText);
-	    List<NameIdentifierPair> nameIdentifierPairs = new ArrayList<NameIdentifierPair>();
-	    StringBuilder nameBuffer = new StringBuilder();
-	    int wordCount = words.length;
-	    for (int i = 0; i < wordCount; i++) {
-	    	String word = words[i]; 
-	    	String terminalNonLetter = "";
-	    	if (word.length()>0){
-	    		char lastLetter =word.charAt(word.length()-1);
-		    	if (!Character.isLetter(lastLetter)&& lastLetter!=')' && lastLetter!=']' && lastLetter!='}'){
-		    		word = word.substring(0, word.length()-1);
-		    		terminalNonLetter =String.valueOf(lastLetter);
-		    	}
-	    	}
-	    	if (nameBuffer.length()!=0 && word.equalsIgnoreCase("acid")){//special case for acid
-	    		nameBuffer.append(" ");
-	    		nameBuffer.append(word);
-	    		if (i +1 < words.length){
-	    			words[i+1] = terminalNonLetter + words[i+1];
-	    		}
-	    		continue;
-	    	}
-	    	ParseRulesResults prr = pr.getParses(word);
-	    	if (prr.getUninterpretableName().length()==0){
-	    		if (nameBuffer.length()!=0){
-	    			nameBuffer.append(" ");
-	    		}
-	    		if (i +1 < words.length){
-	    			words[i+1] = terminalNonLetter + words[i+1];
-	    		}
-	    		nameBuffer.append(word);
-	    	}
-	    	else{
-	    		List<NameIdentifierPair>  identifiersForThisName = new ArrayList<NameIdentifierPair>();
-	    		if (!nameBuffer.toString().equals("")){
-	    			String name = nameBuffer.toString();
-	    			identifiersForThisName = findIdentifiers(name, words, i);
-	    			if (identifiersForThisName.size()>0 && OPSIN_RESULT_STATUS.FAILURE.equals(NameToStructure.getInstance().parseChemicalName(name, false).getStatus())){
-	    				identifiersForThisName.clear();
-	    			}
-	    		}
-		    	String inchi = ChemNameDictSingleton.getInChIForShortestSmiles(word);
-		    	if (inchi !=null){
-		    		if (i +1 < words.length){
-		    			words[i+1] = terminalNonLetter + words[i+1];
-		    		}
-		    		identifiersForThisName = findIdentifiers(word, words, i +1);
-		    	}
-    			nameIdentifierPairs.addAll(identifiersForThisName);
-	    		nameBuffer = new StringBuilder();
-	    	}
+		String[] words = matchWhiteSpace.split(fullText);
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames(words);
+		List<IdentifiedChemicalName> resolvedChemicalNames = new ArrayList<IdentifiedChemicalName>();
+		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
+			//System.out.println(identifiedChemicalName.getValue());
+			OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getValue(), false);
+			if (or.getStatus() != OPSIN_RESULT_STATUS.FAILURE){
+				identifiedChemicalName.setOpsinResult(or);
+				resolvedChemicalNames.add(identifiedChemicalName);
+			}
 		}
-		return nameIdentifierPairs;
+		for (IdentifiedChemicalName resolvedChemicalName : resolvedChemicalNames) {
+			System.out.println(resolvedChemicalName.getValue());
+		}
+		return null;
 	}
 
 	private static List<NameIdentifierPair> findIdentifiers(String name, String[] words, int i) {
+		List<NameIdentifierPair> nameIdentifierPairs = new ArrayList<NameIdentifierPair>();
 		if (i < words.length){
 			String nextWord = joinWordsIfBracketsAreUnbalanced(words[i], i, words);
-			return findIdentifiers(name, nextWord);
+			nameIdentifierPairs = findIdentifiers(name, nextWord);
 		}
-		return new ArrayList<NameIdentifierPair>();
+		if (nameIdentifierPairs.size()==0){
+			if (i -1 >=0){
+				nameIdentifierPairs = findIdentifiers(name, words[i-1]);
+			}
+		}
+		return nameIdentifierPairs;
 	}
 
 	static List<NameIdentifierPair> findIdentifiers(String name, String nextWord) {
@@ -101,6 +68,9 @@ public class NameIdentifierPairFinder {
 		if (m.lookingAt()){
 			String[] identifiers = matchComma.split(m.group(1));
 			for (String identifier : identifiers) {
+				if (identifier.contains("%")){
+					continue;
+				}
 				m = hasDigits.matcher(identifier);
 				if (m.find()){
 					nameIdentifierPairs.add(new NameIdentifierPair(name, identifier, IdentifierType.identifier));
