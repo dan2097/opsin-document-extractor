@@ -19,8 +19,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class DataExtractorFromEPO {
 
 	public static void main(String[] args) throws Exception {
-		String fileName = "src/main/resources/org/bitbucket/dan2097/structureExtractor/EPO-2009-05-06/EP 1326865B1/DOC00001.xml";
-		//String fileName ="C:/My Documents/Patents/USPTO-50/US5616599_SIMPLE_XML.xml";
+		//String fileName = "src/main/resources/org/bitbucket/dan2097/structureExtractor/EPO-2009-05-06/EP 1326865B1/DOC00001.xml";
+		String fileName ="C:/My Documents/Patents/USPTO-50/US6566360_SIMPLE_XML.xml";
 		XMLReader xmlReader;
 		try{
 			xmlReader = XMLReaderFactory.createXMLReader();

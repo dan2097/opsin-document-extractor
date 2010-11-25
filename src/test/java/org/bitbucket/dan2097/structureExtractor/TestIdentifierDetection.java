@@ -7,31 +7,31 @@ import org.junit.Test;
 import static junit.framework.Assert.*;
 
 public class TestIdentifierDetection {
-//	
-//	@Test
-//	public void detectIdentifier1(){
-//		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(8).(22)");
-//		assertEquals(1, nip.size());
-//		assertEquals("8", nip.get(0).identifier);
-//		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
-//	}
-//	
-//	
-//	@Test
-//	public void detectIdentifier2(){
-//		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(5m)");
-//		assertEquals(1, nip.size());
-//		assertEquals("5m", nip.get(0).identifier);
-//		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
-//	}
-//	
-//	@Test
-//	public void detectIdentifier3(){
-//		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(10)");
-//		assertEquals(1, nip.size());
-//		assertEquals("10",  nip.get(0).identifier);
-//		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
-//	}
+	
+	@Test
+	public void detectIdentifier1(){
+		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(8).(22)");
+		assertEquals(1, nip.size());
+		assertEquals("8", nip.get(0).identifier);
+		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
+	}
+	
+	
+	@Test
+	public void detectIdentifier2(){
+		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(5m)");
+		assertEquals(1, nip.size());
+		assertEquals("5m", nip.get(0).identifier);
+		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
+	}
+	
+	@Test
+	public void detectIdentifier3(){
+		List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("foo", "(10)");
+		assertEquals(1, nip.size());
+		assertEquals("10",  nip.get(0).identifier);
+		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
+	}
 //	
 //
 //	@Test
