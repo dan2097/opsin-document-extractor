@@ -6,7 +6,7 @@ import org.bitbucket.dan2097.structureExtractor.NameIdentifierPair.IdentifierTyp
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
-public class ExtractingExperimentalCompoundNames {
+public class IdentifierDetection {
 	
 	@Test
 	public void detectIdentifier1(){
@@ -98,4 +98,26 @@ public class ExtractingExperimentalCompoundNames {
 		assertEquals("1", pair1.identifier);
 		assertEquals(IdentifierType.identifier, pair1.identifierType);
 	}
+	
+	@Test
+	public void detectNameAndIdentifier6() throws Exception{
+		String text = "	Reference Example 6\n1-(3-cyclopentyloxy-4-methoxyphenyl)cyclopent-3-encarbonitrile";
+		List<NameIdentifierPair> results =  NameIdentifierPairFinder.extractNameIdentifierPairs(text);
+		assertEquals(1, results.size());
+		NameIdentifierPair pair1 = results.get(0);
+		assertEquals("1-(3-cyclopentyloxy-4-methoxyphenyl)cyclopent-3-encarbonitrile", pair1.name);
+		assertEquals("6", pair1.identifier);
+		assertEquals(IdentifierType.identifier, pair1.identifierType);
+	}
+	
+	
+
+	@Test
+	public void detectNameAndIdentifierFalsePositive1() throws Exception{
+		String text = "2-(pyridine-2-yl)benzo[b]thiophene (Yield: 35.4 %)";
+		List<NameIdentifierPair> results =  NameIdentifierPairFinder.extractNameIdentifierPairs(text);
+		assertEquals(0, results.size());
+	}
+	
+	
 }
