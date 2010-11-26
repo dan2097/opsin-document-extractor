@@ -112,6 +112,40 @@ public class TestChemicalNameDetection {
 	}
 
 	@Test
+	public void testSynonym() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione (caffeine)");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione (caffeine)", identifiedNames.get(0).getValue());//this behaviour is not ideal
+		assertEquals(0, identifiedNames.get(0).getStart());
+	}
+	
+	@Test
+	public void testNonchemicalBrackets() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("energy drink (1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione: 250mg and water: 250ml");
+		assertEquals(2, identifiedNames.size());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getValue());
+		assertEquals("water", identifiedNames.get(1).getValue());
+		assertEquals(2, identifiedNames.get(0).getStart());
+		assertEquals(5, identifiedNames.get(1).getStart());
+	}
+	
+	@Test
+	public void testAdjacentNonNameInformation1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene( 50 ml)");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene", identifiedNames.get(0).getValue());
+		assertEquals(0, identifiedNames.get(0).getStart());
+	}
+	
+	@Test
+	public void testAdjacentNonNameInformation2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene(50 ml)");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene", identifiedNames.get(0).getValue());
+		assertEquals(0, identifiedNames.get(0).getStart());
+	}
+
+	@Test
 	public void testList() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("An alkane or alkyl halide such as: ethane, propane, butane, ethyl chloride, propyl bromide or butyl chloride.");
 		assertEquals(6, identifiedNames.size());
