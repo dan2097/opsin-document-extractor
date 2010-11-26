@@ -86,7 +86,7 @@ public class DocumentToStructures {
 			return name;
 		}
 		else if (openBrackets==1){
-			Character firstLetter= name.charAt(01);
+			Character firstLetter= name.charAt(0);
 			if (firstLetter =='(' || firstLetter =='[' || firstLetter =='{'){
 				name = name.substring(1);
 			}
