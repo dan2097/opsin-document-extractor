@@ -1,9 +1,10 @@
 package org.bitbucket.dan2097.structureExtractor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import nu.xom.Document;
 import nu.xom.Element;
@@ -40,7 +41,8 @@ public class XMLDocumentToString {
 		return breakingTags;
 	}
 	
-	public String convertDocumentToString(Document doc) throws Exception{
+	public List<String> convertDocumentToNewLineDelimitedList(Document doc){
+		List<String> newLineDelimitedList = new ArrayList<String>();
 	    Element rootElement = doc.getRootElement();
 	    Stack<Node> elementStack = new Stack<Node>();
 	    elementStack.add(rootElement);
@@ -57,12 +59,15 @@ public class XMLDocumentToString {
 				if (currentNode instanceof Element){
 					String localName = ((Element)currentNode).getLocalName();
 					if (breakingTags.contains(localName)){
-				    	articleSb.append("\n");
+						newLineDelimitedList.add(articleSb.toString());
+						articleSb = new StringBuilder();
 					}
 			    }
 			}
 	    }
-	    String text = articleSb.toString();
-	    return PreProcesssor.preProcess(text);
+	    if (!articleSb.toString().equals("")){
+	    	newLineDelimitedList.add(articleSb.toString());
+	    }
+	    return newLineDelimitedList;
 	}
 }
