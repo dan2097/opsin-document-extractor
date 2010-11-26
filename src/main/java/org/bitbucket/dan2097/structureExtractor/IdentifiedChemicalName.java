@@ -12,7 +12,7 @@ public class IdentifiedChemicalName {
 		return opsinResult;
 	}
 
-	void setOpsinResult(OpsinResult opsinResult) {
+	public void setOpsinResult(OpsinResult opsinResult) {
 		this.opsinResult = opsinResult;
 	}
 
