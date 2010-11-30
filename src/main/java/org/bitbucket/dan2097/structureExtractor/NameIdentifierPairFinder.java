@@ -31,7 +31,7 @@ public class NameIdentifierPairFinder {
 	}
 	
 	public static List<NameIdentifierPair> extractNameIdentifierPairs(String fullText) throws Exception{
-		String[] words = matchWhiteSpace.split(fullText);
+		String[] words = matchWhiteSpace.split(PreProcesssor.preProcess(fullText));
 		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames(words);
 		List<IdentifiedChemicalName> resolvedChemicalNames = new ArrayList<IdentifiedChemicalName>();
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {

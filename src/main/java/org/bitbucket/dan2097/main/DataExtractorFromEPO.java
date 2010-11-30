@@ -13,9 +13,9 @@ import org.bitbucket.dan2097.structureExtractor.XMLFileToXMLDocument;
 public class DataExtractorFromEPO {
 
 	public static void main(String[] args) throws Exception {
-		//String fileName = "src/main/resources/org/bitbucket/dan2097/structureExtractor/EPO-2009-05-06/EP 1326865B1/DOC00001.xml";
-		String fileName ="C:/My Documents/Patents/USPTO-50/foo.xml"; 
-		Document doc = XMLFileToXMLDocument.readXMLFileUsingXomBuilder(new File(fileName));
+		//String fileName = "C:/My Documents/Patents/EPO-2009-05-06/EP 1308440B1/DOC00001.xml";
+		//String fileName = "C:/My Documents/Patents/EPO-2009-05-06/EP 1308440B1/DOC00001.xml";
+		Document doc = XMLFileToXMLDocument.readXMLFileUsingHtmlTagSoup(new File("C:/My Documents/Patents/USPTO-50xml/US4282233_SIMPLE_XML.xml"));
 		XMLDocumentToString xmlDocToString = new XMLDocumentToString();
 		List<String> contents = xmlDocToString.convertDocumentToNewLineDelimitedList(doc);
 		for (String string : contents) {

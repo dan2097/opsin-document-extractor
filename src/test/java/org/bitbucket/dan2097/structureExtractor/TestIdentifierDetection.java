@@ -32,6 +32,14 @@ public class TestIdentifierDetection {
 		assertEquals("10",  nip.get(0).identifier);
 		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
 	}
+	
+	@Test
+	public void detectIdentifier4(){
+		//List<NameIdentifierPair> nip = NameIdentifierPairFinder.findIdentifiers("Example 5");
+//		assertEquals(1, nip.size());
+//		assertEquals("10",  nip.get(0).identifier);
+//		assertEquals(IdentifierType.identifier, nip.get(0).identifierType);
+	}
 //	
 //
 //	@Test

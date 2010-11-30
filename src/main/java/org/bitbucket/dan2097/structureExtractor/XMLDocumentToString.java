@@ -17,6 +17,7 @@ public class XMLDocumentToString {
 	private Set<String> breakingTags = new HashSet<String>();
 
 	public XMLDocumentToString() {
+		//HTML		
 		addBreakingTag("p");
 		addBreakingTag("ol");
 	    addBreakingTag("ul");
@@ -27,6 +28,12 @@ public class XMLDocumentToString {
 	    addBreakingTag("dd");
 	    addBreakingTag("br");
 	    addBreakingTag("div");
+
+	    //EPO XML
+	    addBreakingTag("heading");
+	    
+	    //USPTO XML
+	    addBreakingTag("PDAT");
 	}
 	
 	public boolean addBreakingTag(String tag){
