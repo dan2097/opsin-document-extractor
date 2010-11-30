@@ -204,4 +204,40 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("1-[4-(5-bromopyrimidin-2-ylsulfanyl)phenyl]-3-(2-nitrobenzoyl)-urea", identifiedNames.get(0).getValue());
 	}
+	
+	@Test
+	public void erroneousSpaces1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("ethyl benzene");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethyl benzene", identifiedNames.get(0).getValue());//erroneous space will be fixed by OPSIN later
+	}
+	
+	@Test
+	public void erroneousSpaces2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("eth ane");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethane", identifiedNames.get(0).getValue());
+	}
+
+	@Test
+	public void erroneousSpaces3() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("et hane");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethane", identifiedNames.get(0).getValue());
+	}
+	
+	@Test
+	public void erroneousSpaces4() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("2-[N-[ 3-(N-cyclopentylmethyl-N-ethyl)amino-6- methoxypyrid in-2-yl]methyl-N-(3-t rifluoromethylbe nzyl)]amino-5-(2-methylsulfinylethoxy)py rimidine");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl]methyl-N-(3-trifluoromethylbenzyl)]amino-5-(2-methylsulfinylethoxy)pyrimidine", identifiedNames.get(0).getValue());
+	}
+	
+	@Test
+	public void erroneousSpaces5() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("ethylbenz ene");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethylbenzene", identifiedNames.get(0).getValue());
+	}
+
 }
