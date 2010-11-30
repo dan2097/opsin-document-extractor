@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,14 @@ import uk.ac.cam.ch.wwmm.opsin.OpsinResult.OPSIN_RESULT_STATUS;
 
 public class ProcessFolder {
 	public static void main(String[] args) throws Exception {
+		BufferedReader input = new BufferedReader(new FileReader("C:/My Documents/Patents/expected.inchi"));
+		String line = null;
+		List<String> normalisedReferenceInChIs = new ArrayList<String>();
+		while ((line = input.readLine()) != null) {
+			normalisedReferenceInChIs.add(InchiPruner.mainChargeAndStereochemistryLayers(line));
+		}
+		input.close();
+		
 		String inputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/";
 		String outputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/OPSIN/";
 		
@@ -39,8 +48,8 @@ public class ProcessFolder {
 		File[] files = inputDirectory.listFiles();
 		XMLDocumentToString xmlDocumentToString = new XMLDocumentToString();
 		NameToStructure n2s = NameToStructure.getInstance();
-		Set<String> normalisedInChIs = new HashSet<String>();
 		for (int i = 0; i < files.length; i++) {
+			Set<String> normalisedInChIs = new HashSet<String>();
 			File inputFile =files[i];
 			if (!inputFile.isFile()){
 				continue;
@@ -65,23 +74,11 @@ public class ProcessFolder {
 					}
 				}
 			}
+			if (normalisedInChIs.contains(normalisedReferenceInChIs.get(i-1))){
+				System.out.println(i);
+			}
 			writer.close();
 			//writer2.close();
 		}
-		BufferedReader input = new BufferedReader(new FileReader("C:/My Documents/Patents/expected.inchi"));
-		String line = null;
-		int i=0;
-		int j=0;
-		System.out.println(normalisedInChIs.size());
-		while ((line = input.readLine()) != null) {
-			String inchi = InchiPruner.mainChargeAndStereochemistryLayers(line);
-			j++;
-			if (normalisedInChIs.contains(inchi)){
-				System.out.println(j);
-				i++;
-			}
-		}
-		System.out.println(i);
-		input.close();
 	}
 }
