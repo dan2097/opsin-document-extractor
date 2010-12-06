@@ -265,4 +265,20 @@ public class TestChemicalNameDetection {
 		assertEquals("2-nitrobenzenesulfonamide", identifiedNames.get(0).getValue());
 		assertEquals(3, identifiedNames.get(0).getStart());
 	}
+	
+	@Test
+	public void erroneousSpaces7() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene -ethanol");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene-ethanol", identifiedNames.get(0).getValue());
+		assertEquals(0, identifiedNames.get(0).getStart());
+	}
+	
+	@Test
+	public void erroneousSpaces8() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene ethane");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene ethane", identifiedNames.get(0).getValue());
+	}
 }
