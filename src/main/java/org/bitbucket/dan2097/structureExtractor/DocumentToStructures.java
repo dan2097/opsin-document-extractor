@@ -59,6 +59,7 @@ public class DocumentToStructures {
 		ParseRules pr = NameToStructure.getOpsinParser();
 		StringBuilder nameBuffer = new StringBuilder();
 		int wordsLength =words.length;
+		int totalSpacesRemoved =0;
 		for (int i = 0; i < wordsLength; i++) {
 			String stringToTest= (i+1)<wordsLength ? words[i] + " "+ words[i+1] : words[i];
 			ParseRulesResults prr = pr.getParses(stringToTest);
@@ -66,15 +67,18 @@ public class DocumentToStructures {
 			if (prr.getParseTokensList().size()==0 && (i+1)<wordsLength){
 				stringToTest=words[i] + words[i+1];
 				prr = pr.getParses(stringToTest);
-				spacesRemoved++;
+				if (prr.getParseTokensList().size()!=0){
+					spacesRemoved++;
+				}
 			}
 			if (prr.getParseTokensList().size()==0){
 				if (!nameBuffer.toString().equals("")){
 					String name =nameBuffer.toString();
 					name= stripUnbalancedTrailingOrLeadingBracket(name);
-					identifiedChemicalNames.add(new IdentifiedChemicalName(i-matchWhiteSpace.split(name).length, name));
+					identifiedChemicalNames.add(new IdentifiedChemicalName(i-(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved), name));
 					nameBuffer = new StringBuilder();
 				}
+				totalSpacesRemoved =0;
 			}
 			else{
 				String uninterpretableName = prr.getUninterpretableName();
@@ -93,6 +97,16 @@ public class DocumentToStructures {
 						continue;
 					}
 				}
+				else if (isFullWord(prr)){
+					//e.g. benzene sulfonamide
+					SpaceRemovalResult srr =attemptSpaceRemoval(words, i, uninterpretableName, stringToTest, pr, wordsLength);
+					if (srr.isSuccess()){
+						prr = srr.getParseRulesResults();
+						uninterpretableName = prr.getUninterpretableName();
+						uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
+						spacesRemoved +=srr.getSpacesRemoved();
+					}
+				}
 				if (!nameBuffer.toString().equals("")){
 					nameBuffer.append(" ");
 				}
@@ -105,15 +119,19 @@ public class DocumentToStructures {
 				if (uninterpretedWordSection.length()==1){//encountered punctuation
 					String name =nameBuffer.toString();
 					name= stripUnbalancedTrailingOrLeadingBracket(name);
-					identifiedChemicalNames.add(new IdentifiedChemicalName(i + 1 -matchWhiteSpace.split(name).length, name));
+					identifiedChemicalNames.add(new IdentifiedChemicalName(i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved), name));
 					nameBuffer = new StringBuilder();
+					totalSpacesRemoved =0;
+				}
+				else{
+					totalSpacesRemoved+=spacesRemoved;
 				}
 			}
 		}
 		if (!nameBuffer.toString().equals("")){
 			String name =nameBuffer.toString();
 			name= stripUnbalancedTrailingOrLeadingBracket(name);
-			identifiedChemicalNames.add(new IdentifiedChemicalName(wordsLength - matchWhiteSpace.split(name).length, name));
+			identifiedChemicalNames.add(new IdentifiedChemicalName(wordsLength - (matchWhiteSpace.split(name).length + totalSpacesRemoved), name));
 		}
 		return identifiedChemicalNames;
 	}
@@ -153,12 +171,16 @@ public class DocumentToStructures {
 		return new SpaceRemovalResult(false, spacesRemoved, null);
 	}
 	
-	private static boolean fullWordFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {
-		//exception made for full chemical followed by bracketed section
+	private static boolean isFullWord(ParseRulesResults prr){
 		List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
 		Character finalAnnotation = annotations.get(annotations.size() -1);
+		return finalAnnotation.equals(endOfMainGroup);
+	}
+	
+	private static boolean fullWordFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {
+		//exception made for full chemical followed by bracketed section
 		Character firstLetter= uninterpretedWordSection.charAt(0);
-		if (finalAnnotation.equals(endOfMainGroup) && (firstLetter =='(' || firstLetter =='[' || firstLetter =='{')){
+		if (isFullWord(prr) && (firstLetter =='(' || firstLetter =='[' || firstLetter =='{')){
 			return true;
 		}
 		return false;
