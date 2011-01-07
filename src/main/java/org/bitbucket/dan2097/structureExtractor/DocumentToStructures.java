@@ -12,7 +12,7 @@ import uk.ac.cam.ch.wwmm.opsin.StringTools;
 
 public class DocumentToStructures {
 	
-	private static  class SpaceRemovalResult{
+	private static class SpaceRemovalResult{
 		boolean isSuccess() {
 			return success;
 		}
