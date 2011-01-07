@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>unknown</groupId>
-	<artifactId>unknown</artifactId>
+	<groupId>uk.ac.cam.ch.opsin</groupId>
+	<artifactId>opsin-document-extractor</artifactId>
 	<name>Activity and Structure Extractor</name>
 	<version>0.1-SNAPSHOT</version>
-	<description>???</description>
+	<description>Utilises OPSIN to perform brute force discovery of chemical names that are parsable by OPSIN</description>
 	<licenses>
 		<license>
 			<name>Artistic License 2.0</name>
@@ -12,15 +12,15 @@
 		</license>
 	</licenses>
   <packaging>jar</packaging>
-  <!-- <scm>
-    <connection>
-      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin/
-    </connection>
-    <developerConnection>
-      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin/
-    </developerConnection>
-    <url>http://bitbucket.org/dan2097/opsin/</url>
-	</scm>-->
+    <scm>
+	    <connection>
+	      scm:hg:https://dan2097@bitbucket.org/dan2097/activityandstructureextractor/
+	    </connection>
+	    <developerConnection>
+	      scm:hg:https://dan2097@bitbucket.org/dan2097/activityandstructureextractor/
+	    </developerConnection>
+	    <url>http://bitbucket.org/dan2097/activityandstructureextractor/</url>
+	</scm>
 	<developers>
 		<developer>
 			<name>Daniel Lowe</name>
