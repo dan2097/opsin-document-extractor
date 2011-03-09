@@ -36,7 +36,7 @@ public class NameIdentifierPairFinder {
 		List<IdentifiedChemicalName> resolvedChemicalNames = new ArrayList<IdentifiedChemicalName>();
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			//System.out.println(identifiedChemicalName.getValue());
-			OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getValue(), false);
+			OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getValue());
 			if (or.getStatus() != OPSIN_RESULT_STATUS.FAILURE){
 				identifiedChemicalName.setOpsinResult(or);
 				resolvedChemicalNames.add(identifiedChemicalName);
