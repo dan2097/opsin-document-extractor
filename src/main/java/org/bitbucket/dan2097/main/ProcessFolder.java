@@ -64,9 +64,9 @@ public class ProcessFolder {
 				List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames(chunk);
 				//writer2.append(chunk +"\n");
 				for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
-					OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getValue());
+					OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getChemicalName());
 					if (or.getStatus() != OPSIN_RESULT_STATUS.FAILURE){
-						writer.write(identifiedChemicalName.getValue() +"\n");
+						writer.write(identifiedChemicalName.getChemicalName() +"\n");
 						String inchi =NameToInchi.convertResultToInChI(or);
 						if (inchi!=null){
 							normalisedInChIs.add(InchiPruner.mainChargeAndStereochemistryLayers(inchi));

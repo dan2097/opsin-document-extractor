@@ -15,8 +15,6 @@ public class PreProcesssor {
 	private static final Pattern MATCH_DOLLAR = Pattern.compile("\\$");
 	private static final Pattern MATCH_SULPH = Pattern.compile("sulph");
 	private static final HashMap<String, String> GREEK_MAP = new HashMap<String, String>();
-	private static final Pattern MATCH_WHITESPACE = Pattern.compile("\\s+");
-
 	static {
 		GREEK_MAP.put("a", "alpha");
 		GREEK_MAP.put("b", "beta");
@@ -28,7 +26,6 @@ public class PreProcesssor {
 	
 	
 	public static String preProcess(String sentence){
-		sentence = sentence.trim();//remove leading and trailing whitespace
 		sentence = processDollarPrefixedGreeks(sentence);
 		sentence = convertNonAsciiAndNormaliseRepresentation(sentence);
 		sentence = MATCH_SULPH.matcher(sentence).replaceAll("sulf");//correct British spelling to the IUPAC spelling
@@ -57,7 +54,6 @@ public class PreProcesssor {
 	 * @throws PreProcessingException
 	 */
 	private static String convertNonAsciiAndNormaliseRepresentation(String s){
-		s = MATCH_WHITESPACE.matcher(s).replaceAll(" ");//normalise white space
 		StringBuilder sb = new StringBuilder(s);
 		for(int i=0;i<sb.length();i++) {
 			char c = sb.charAt(i);
