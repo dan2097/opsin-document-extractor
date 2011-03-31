@@ -19,7 +19,6 @@ public class IdentifiedChemicalName {
 	public IdentifiedChemicalName(int start, String value) {
 		this.start =start;
 		this.value =value;
-
 	}
 
 	public String getValue() {
