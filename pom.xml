@@ -14,12 +14,12 @@
   <packaging>jar</packaging>
     <scm>
 	    <connection>
-	      scm:hg:https://dan2097@bitbucket.org/dan2097/activityandstructureextractor/
+	      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
 	    </connection>
 	    <developerConnection>
-	      scm:hg:https://dan2097@bitbucket.org/dan2097/activityandstructureextractor/
+	      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
 	    </developerConnection>
-	    <url>http://bitbucket.org/dan2097/activityandstructureextractor/</url>
+	    <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 	</scm>
 	<developers>
 		<developer>
