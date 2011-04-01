@@ -90,15 +90,21 @@ public class DictionaryLookup {
 					currentHashHolder.setWordToHashHolderMap(wordToHashHolderMap);
 					currentHashHolder = new HashHolder(isTerminal);
 					wordToHashHolderMap.put(words[i], currentHashHolder);
-					if (name.equals("monosodium cloxacillin")){
-						System.out.println(words[i]);
-					}
 				}
 			}
 		}
 	}
+	
+	public static List<IdentifiedChemicalName> performDictionaryLookup(String[] words) {
+		int wordsLength =words.length;
+		String[] normalisedWords = new String[wordsLength];
+		for (int i = wordsLength -1; i >=0; i--) {
+			normalisedWords[i] = PreProcesssor.preProcess(words[i]).toLowerCase();
+		}
+		return performDictionaryLookup(normalisedWords, words);
+	}
 
-	public static List<IdentifiedChemicalName> performDictionaryLookup(String[] normalisedWords, String[] words) {
+	private static List<IdentifiedChemicalName> performDictionaryLookup(String[] normalisedWords, String[] words) {
 		List<IdentifiedChemicalName> identifiedNames = new ArrayList<IdentifiedChemicalName>();
 		int wordsLength = words.length;
 		for (int i = 0; i < wordsLength; i++) {
