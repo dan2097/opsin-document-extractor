@@ -35,7 +35,7 @@ public class ProcessFolder {
 		input.close();
 		
 		String inputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/";
-		String outputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/OPSIN/";
+		String outputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/OPSIN2/";
 		
 		File inputDirectory = new File(inputDirectoryLocation);
 		if (!inputDirectory.isDirectory()){
@@ -48,6 +48,7 @@ public class ProcessFolder {
 		File[] files = inputDirectory.listFiles();
 		XMLDocumentToString xmlDocumentToString = new XMLDocumentToString();
 		NameToStructure n2s = NameToStructure.getInstance();
+		int patentCounter =0;
 		for (int i = 0; i < files.length; i++) {
 			Set<String> normalisedInChIs = new HashSet<String>();
 			File inputFile =files[i];
@@ -74,8 +75,8 @@ public class ProcessFolder {
 					}
 				}
 			}
-			if (normalisedInChIs.contains(normalisedReferenceInChIs.get(i-1))){
-				System.out.println(i);
+			if (normalisedInChIs.contains(normalisedReferenceInChIs.get(patentCounter++))){
+				System.out.println(patentCounter);
 			}
 			writer.close();
 			//writer2.close();
