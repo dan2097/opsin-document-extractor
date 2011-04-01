@@ -43,13 +43,13 @@ public class ExtraDictionaryFromChEBIOBO {
 					}
 					else if(cLine.startsWith("synonym: ") && !(cLine.contains("InChI") || cLine.contains("FORMULA"))) {
 						String[] tempArray = cLine.split("\"");
-						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>1){
+						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>2){
 							names.add(tempArray[1].toLowerCase());
 						}
 					}
 					else if(cLine.startsWith("name: ")) {//ChEBI name
 						String[] tempArray = cLine.split(": ");
-						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>1){
+						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>2){
 							names.add(tempArray[1].toLowerCase());
 						}
 					}
