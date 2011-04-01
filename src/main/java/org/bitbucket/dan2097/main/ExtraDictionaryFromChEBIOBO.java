@@ -43,11 +43,16 @@ public class ExtraDictionaryFromChEBIOBO {
 					}
 					else if(cLine.startsWith("synonym: ") && !(cLine.contains("InChI") || cLine.contains("FORMULA"))) {
 						String[] tempArray = cLine.split("\"");
-						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null){
+						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>1){
 							names.add(tempArray[1].toLowerCase());
 						}
 					}
-					
+					else if(cLine.startsWith("name: ")) {//ChEBI name
+						String[] tempArray = cLine.split(": ");
+						if (n2s.parseChemicalName(tempArray[1]).getSmiles()==null && tempArray[1].length()>1){
+							names.add(tempArray[1].toLowerCase());
+						}
+					}
 				}
 				if (id!=null && inchi!=null  && smiles!=null && names.size()>0){
 					for (String name : names) {
