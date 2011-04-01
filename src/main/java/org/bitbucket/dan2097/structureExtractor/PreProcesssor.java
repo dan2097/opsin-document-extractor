@@ -153,7 +153,7 @@ public class PreProcesssor {
 
             case '\uFEFF': return "";//BOM-found at the start of some UTF files
 
-            default: return String.valueOf(c);
+            default: return "!";
         }
     }
 }
