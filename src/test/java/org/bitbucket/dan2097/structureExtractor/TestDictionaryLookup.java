@@ -42,13 +42,18 @@ public class TestDictionaryLookup {
 	
 	@Test
 	public void testMultiWordCase2() throws Exception{
-		String[] words =new String[]{"cloxacillin", "sodium", "hydrate"};
+		String[] words =new String[]{"Betamethasone", "sodium", "phosphate"};
 		List<IdentifiedChemicalName> identifiedNames = DictionaryLookup.performDictionaryLookup(words);
 		assertEquals(2, identifiedNames.size());
-		assertEquals("cloxacillin", identifiedNames.get(0).getChemicalName());
-		assertEquals("cloxacillin", identifiedNames.get(0).getTextValue());
-		assertEquals("cloxacillin sodium hydrate", identifiedNames.get(1).getChemicalName());
-		assertEquals("cloxacillin sodium hydrate", identifiedNames.get(1).getTextValue());
+		
+		assertEquals("betamethasone", identifiedNames.get(0).getChemicalName());
+		assertEquals("Betamethasone", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		
+		assertEquals("betamethasone sodium phosphate", identifiedNames.get(1).getChemicalName());
+		assertEquals("Betamethasone sodium phosphate", identifiedNames.get(1).getTextValue());
 		assertEquals(0, identifiedNames.get(1).getWordPositionStartIndice());
+		assertEquals(2, identifiedNames.get(1).getWordPositionEndIndice());
 	}
 }
