@@ -318,12 +318,22 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
-	public void erroneousSpaces8() throws Exception{
+	public void intendedSpace1() throws Exception{
 		//counter example
 		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene ethane");
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene ethane", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene ethane", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void intendedSpace2() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("benzene acetate");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene acetate", identifiedNames.get(0).getChemicalName());
+		assertEquals("benzene acetate", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 }

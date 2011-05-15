@@ -90,7 +90,7 @@ public class DocumentToStructures {
 						continue;
 					}
 				}
-				else if (isFullWord(prr)){
+				else if (isFullWord(prr) && !nextWordIsFullWord(normalisedWords, i, uninterpretableName, wordsLength)){
 					//e.g. benzene sulfonamide
 					SpaceRemovalResult srr =attemptSpaceRemoval(normalisedWords, i, uninterpretableName, stringToTest, wordsLength);
 					if (srr.isSuccess()){
@@ -133,6 +133,20 @@ public class DocumentToStructures {
 		return identifiedChemicalNames;
 	}
 
+	private static boolean nextWordIsFullWord(String[] normalisedWords, int i,String uninterpretableName, int wordsLength) {
+		String secondWord =null;
+		if (matchWhiteSpace.split(uninterpretableName).length==2 && (i+1)<wordsLength){
+			secondWord = normalisedWords[i+1];
+		}
+		else if ((i+2)<wordsLength){
+			secondWord = normalisedWords[i+2];
+		}
+		if (secondWord!=null){
+			return isFullWord(getParses(secondWord));
+		}
+		return false;
+	}
+
 	private static ParseRulesResults getParses(String stringToTest) {
 		try {
 			return pr.getParses(stringToTest);
@@ -156,7 +170,7 @@ public class DocumentToStructures {
 		String parsedOpsinNormalisedText =StringTools.stringListToString(getParses(stringToTest).getParseTokensList().get(0).getTokens(), "");
 		String newParsedOpsinNormalisedText = parsedOpsinNormalisedText;
 		int indiceTojoin =i+2;
-		do {//join with subsequent words until either the chemical name is fully interpretable or the join does not increse the amount of interpretable name
+		do {//join with subsequent words until either the chemical name is fully interpretable or the join does not increase the amount of interpretable name
 			if (indiceTojoin >=wordsLength){
 				break;
 			}
@@ -185,8 +199,19 @@ public class DocumentToStructures {
 		return false;
 	}
 	
+	/**
+	 * Determines whether a parse rules results describes a "full" word by checking whether the final annotation is an endOfMainGroup
+	 * @param prr
+	 * @return
+	 */
 	private static boolean isFullWord(ParseRulesResults prr){
+		if (prr.getParseTokensList().size()==0){
+			return false;
+		}
 		List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
+		if (annotations.size()==0){
+			return false;
+		}
 		Character finalAnnotation = annotations.get(annotations.size() -1);
 		return finalAnnotation.equals(endOfMainGroup);
 	}
