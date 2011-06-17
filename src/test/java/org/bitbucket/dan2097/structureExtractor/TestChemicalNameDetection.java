@@ -127,10 +127,29 @@ public class TestChemicalNameDetection {
 	@Test
 	public void testSynonym() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione (caffeine)");
-		assertEquals(1, identifiedNames.size());
-		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione (caffeine)", identifiedNames.get(0).getChemicalName());//this behaviour is not ideal
-		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione (caffeine)", identifiedNames.get(0).getTextValue());
+		assertEquals(2, identifiedNames.size());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getChemicalName());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getTextValue());
+		assertEquals("caffeine", identifiedNames.get(1).getChemicalName());
+		assertEquals("(caffeine)", identifiedNames.get(1).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(1, identifiedNames.get(1).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(1).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void testSynonym2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione ( caffeine )");
+		assertEquals(2, identifiedNames.size());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getChemicalName());
+		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getTextValue());
+		assertEquals("caffeine", identifiedNames.get(1).getChemicalName());
+		assertEquals("caffeine", identifiedNames.get(1).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(2, identifiedNames.get(1).getWordPositionStartIndice());
+		assertEquals(2, identifiedNames.get(1).getWordPositionEndIndice());
 	}
 	
 	@Test
@@ -143,6 +162,25 @@ public class TestChemicalNameDetection {
 		assertEquals("water:", identifiedNames.get(1).getTextValue());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(5, identifiedNames.get(1).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testNonchemicalBrackets2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("(tetrahydrofuran)");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("tetrahydrofuran", identifiedNames.get(0).getChemicalName());
+		assertEquals("(tetrahydrofuran)", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testNonchemicalBrackets3() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("( tetrahydrofuran )");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("tetrahydrofuran", identifiedNames.get(0).getChemicalName());
+		assertEquals("tetrahydrofuran", identifiedNames.get(0).getTextValue());
+		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 	}
 	
 	@Test

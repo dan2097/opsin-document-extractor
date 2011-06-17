@@ -65,10 +65,9 @@ public class DocumentToStructures {
 			if (prr.getParseTokensList().size()==0){//input could not be used to form a chemical name
 				if (!chemicalNameBuffer.toString().equals("")){//a chemical name is already in the buffer, add it to the identifiedChemicalNames
 					String name =chemicalNameBuffer.toString();
-					name= stripUnbalancedTrailingOrLeadingBracket(name);
 					int startingIndice = i-(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int finalIndice = i -1;
-					identifiedChemicalNames.add(new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(words, startingIndice, finalIndice)));
+					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice, words));
 					chemicalNameBuffer = new StringBuilder();
 				}
 				totalSpacesRemoved =0;
@@ -85,7 +84,7 @@ public class DocumentToStructures {
 						uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
 						spacesRemoved +=srr.getSpacesRemoved();
 					}
-					else if(!fullWordFollowedByBracket(prr, uninterpretedWordSection)){//generally name is uninterpretable but exception made for a full name followed by a bracket e.g. pyridine(5ml)
+					else if(!fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection)){//generally name is uninterpretable but exception made for a full name followed by a bracket e.g. pyridine(5ml)
 						chemicalNameBuffer = new StringBuilder();
 						continue;
 					}
@@ -109,12 +108,11 @@ public class DocumentToStructures {
 					i++;
 				}
 				i = i +spacesRemoved;
-				if (uninterpretedWordSection.length()==1){//encountered punctuation
+				if (uninterpretedWordSection.length()==1 || fullWordFollowedByBracket(prr, words, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
-					name= stripUnbalancedTrailingOrLeadingBracket(name);
 					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int finalIndice = i;
-					identifiedChemicalNames.add(new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(words, startingIndice, finalIndice)));
+					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice, words));
 					chemicalNameBuffer = new StringBuilder();
 					totalSpacesRemoved =0;
 				}
@@ -125,10 +123,9 @@ public class DocumentToStructures {
 		}
 		if (!chemicalNameBuffer.toString().equals("")){
 			String name =chemicalNameBuffer.toString();
-			name= stripUnbalancedTrailingOrLeadingBracket(name);
 			int startingIndice = wordsLength - (matchWhiteSpace.split(name).length + totalSpacesRemoved);
 			int finalIndice = wordsLength -1;
-			identifiedChemicalNames.add(new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(words, startingIndice, finalIndice)));
+			identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice, words));
 		}
 		return identifiedChemicalNames;
 	}
@@ -190,11 +187,21 @@ public class DocumentToStructures {
 		return new SpaceRemovalResult(false, spacesRemoved, null);
 	}
 
-	private static boolean fullWordFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {
+	private static boolean fullWordImmediatelyFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {
 		//exception made for full chemical followed by bracketed section
 		Character firstLetter= uninterpretedWordSection.charAt(0);
-		if (isFullWord(prr) && (firstLetter =='(' || firstLetter =='[' || firstLetter =='{')){
+		if (isFullWord(prr) && isOpenBracket(firstLetter)){
 			return true;
+		}
+		return false;
+	}
+	
+	private static boolean fullWordFollowedByBracket(ParseRulesResults prr,String[] words, int i) {
+		if (isFullWord(prr) && i+1 <words.length){
+			Character firstLetter = words[i+1].charAt(0);
+			if (isOpenBracket(firstLetter)){
+				return true;
+			}
 		}
 		return false;
 	}
@@ -216,41 +223,71 @@ public class DocumentToStructures {
 		return finalAnnotation.equals(endOfMainGroup);
 	}
 
-	private static String stripUnbalancedTrailingOrLeadingBracket(String name) {
-		int openBrackets = numberOfOpenbrackets(name);
-		if (openBrackets==0){
-			return name;
-		}
-		else if (openBrackets==1){
-			Character firstLetter= name.charAt(0);
-			if (firstLetter =='(' || firstLetter =='[' || firstLetter =='{'){
-				name = name.substring(1);
-			}
-		}
-		else if (openBrackets==-1){
-			Character lastLetter= name.charAt(name.length()-1);
-			if (lastLetter ==')' || lastLetter ==']' || lastLetter =='}'){
-				name = name.substring(0, name.length()-1);
-			}
-		}
-		return name;
-	}
-
 	private static int numberOfOpenbrackets(String name) {
 		int bracketLevel = 0;
 		int stringLength  = name.length();
 		for(int i = 0 ; i < stringLength; i++) {
 			char c = name.charAt(i);
-			if(c == '(' || c == '[' || c == '{') {
+			if(isOpenBracket(c)) {
 				bracketLevel++;
 			}
-			else if(c == ')' || c == ']' || c == '}') {
+			else if(isCloseBracket(c)) {
 				bracketLevel--;
 			}
 		}
 		return bracketLevel;
 	}
+
+	private static boolean isOpenBracket(char c){
+		return c == '(' || c == '[' || c == '{';
+	}
+
+	private static boolean isCloseBracket(char c){
+		return c == ')' || c == ']' || c == '}';
+	}
 	
+	/**
+	 * Removes non chemical brackets, updating the starting and final indices appropriately before returning a new IdentifiedChemicalName
+	 * @param name
+	 * @param startingIndice
+	 * @param finalIndice
+	 * @param words
+	 * @return
+	 */
+	private static IdentifiedChemicalName createIdentifiedName(String name,int startingIndice, int finalIndice, String[] words) {
+		boolean frontBracketRemoved =false;
+		boolean endBracketRemoved =true;
+		Character firstLetter= name.charAt(0);
+		Character lastLetter= name.charAt(name.length()-1);
+		int openBrackets = numberOfOpenbrackets(name);
+		if (openBrackets==1){
+			if (isOpenBracket(firstLetter)){
+				name = name.substring(1);
+				frontBracketRemoved =true;
+			}
+		}
+		else if (openBrackets==-1){
+			if (isCloseBracket(lastLetter)){
+				name = name.substring(0, name.length()-1);
+				endBracketRemoved =true;
+			}
+		}
+		else if (openBrackets==0){;
+			if (isOpenBracket(firstLetter) && isCloseBracket(lastLetter)){
+				name = name.substring(1, name.length()-1);
+				frontBracketRemoved =true;
+				endBracketRemoved =true;
+			}
+		}
+		if (frontBracketRemoved && words[startingIndice].length()==1 && isOpenBracket(words[startingIndice].charAt(0))){
+			startingIndice++;
+		}
+		if (endBracketRemoved && words[finalIndice].length()==1 && isCloseBracket(words[finalIndice].charAt(0))){
+			finalIndice--;
+		}
+		return new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(words, startingIndice, finalIndice));
+	}
+
 	private static String extractRawText(String[] words, int startingIndice, int finalIndice) {
 		StringBuilder rawTextBuilder =new StringBuilder();
 		for (int i = startingIndice; i <= finalIndice; i++) {
