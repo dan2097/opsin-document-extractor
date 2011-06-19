@@ -14,7 +14,8 @@ import uk.ac.cam.ch.wwmm.opsin.StringTools;
 public class DocumentToStructures {
 	
 	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
-	private final static char endOfMainGroup = '\u00e2';
+	private static final char END_OF_MAINGROUP = '\u00e2';
+	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
 	private static ParseRules pr;
 
 	static{
@@ -108,7 +109,7 @@ public class DocumentToStructures {
 					i++;
 				}
 				i = i +spacesRemoved;
-				if (uninterpretedWordSection.length()==1 || fullWordFollowedByBracket(prr, words, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
+				if (uninterpretedWordSection.length()==1 || fullOrFunctionalWordFollowedByBracket(prr, words, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
 					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int finalIndice = i;
@@ -196,8 +197,8 @@ public class DocumentToStructures {
 		return false;
 	}
 	
-	private static boolean fullWordFollowedByBracket(ParseRulesResults prr,String[] words, int i) {
-		if (isFullWord(prr) && i+1 <words.length){
+	private static boolean fullOrFunctionalWordFollowedByBracket(ParseRulesResults prr,String[] words, int i) {
+		if ((isFullWord(prr) || isFunctionalWord(prr)) && i+1 <words.length){
 			Character firstLetter = words[i+1].charAt(0);
 			if (isOpenBracket(firstLetter)){
 				return true;
@@ -207,7 +208,7 @@ public class DocumentToStructures {
 	}
 	
 	/**
-	 * Determines whether a parse rules results describes a "full" word by checking whether the final annotation is an endOfMainGroup
+	 * Determines whether a parse rules results describes a "full" word by checking whether the final annotation is an END_OF_MAINGROUP
 	 * @param prr
 	 * @return
 	 */
@@ -220,7 +221,24 @@ public class DocumentToStructures {
 			return false;
 		}
 		Character finalAnnotation = annotations.get(annotations.size() -1);
-		return finalAnnotation.equals(endOfMainGroup);
+		return finalAnnotation.equals(END_OF_MAINGROUP);
+	}
+	
+	/**
+	 * Determines whether a parse rules results describes a "functional" word by checking whether the final annotation is an END_OF_FUNCTIONALTERM
+	 * @param prr
+	 * @return
+	 */
+	private static boolean isFunctionalWord(ParseRulesResults prr){
+		if (prr.getParseTokensList().size()==0){
+			return false;
+		}
+		List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
+		if (annotations.size()==0){
+			return false;
+		}
+		Character finalAnnotation = annotations.get(annotations.size() -1);
+		return finalAnnotation.equals(END_OF_FUNCTIONALTERM);
 	}
 
 	private static int numberOfOpenbrackets(String name) {
