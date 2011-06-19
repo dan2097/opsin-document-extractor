@@ -62,6 +62,15 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
+	public void testTrivalCase7() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("Carbonyl cyanide m-chlorophenyl hydrazone");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("carbonyl cyanide m-chlorophenyl hydrazone", identifiedNames.get(0).getChemicalName());
+		assertEquals("Carbonyl cyanide m-chlorophenyl hydrazone", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
 	public void testStartsWithChemical() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("ethanoic acid ethyl ester is mixed with...");
 		assertEquals(1, identifiedNames.size());
@@ -181,6 +190,20 @@ public class TestChemicalNameDetection {
 		assertEquals("tetrahydrofuran", identifiedNames.get(0).getTextValue());
 		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void testNonchemicalBrackets4() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("dimethyl ether (methoxymethane)");
+		assertEquals(2, identifiedNames.size());
+		assertEquals("dimethyl ether", identifiedNames.get(0).getChemicalName());
+		assertEquals("dimethyl ether", identifiedNames.get(0).getTextValue());
+		assertEquals("methoxymethane", identifiedNames.get(1).getChemicalName());
+		assertEquals("(methoxymethane)", identifiedNames.get(1).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(2, identifiedNames.get(1).getWordPositionStartIndice());
+		assertEquals(2, identifiedNames.get(1).getWordPositionEndIndice());
 	}
 	
 	@Test
