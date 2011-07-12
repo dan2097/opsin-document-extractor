@@ -272,7 +272,7 @@ public class DocumentToStructures {
 	 * @param words
 	 * @return
 	 */
-	private static IdentifiedChemicalName createIdentifiedName(String name,int startingIndice, int finalIndice, String[] words) {
+	private static IdentifiedChemicalName createIdentifiedName(String name, int startingIndice, int finalIndice, String[] words) {
 		boolean frontBracketRemoved =false;
 		boolean endBracketRemoved =true;
 		Character firstLetter= name.charAt(0);

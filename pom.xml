@@ -12,14 +12,14 @@
 		</license>
 	</licenses>
   <packaging>jar</packaging>
-    <scm>
-	    <connection>
-	      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
-	    </connection>
-	    <developerConnection>
-	      scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
-	    </developerConnection>
-	    <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
+  <scm>
+		<connection>
+			scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
+		</connection>
+		<developerConnection>
+			scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
+		</developerConnection>
+		<url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 	</scm>
 	<developers>
 		<developer>
@@ -58,42 +58,42 @@
 	    </plugin>
 	  </plugins>
 	</build>
-	 <dependencies>
+	<dependencies>
 		<dependency>
-		  <groupId>org.ccil.cowan.tagsoup</groupId>
-		  <artifactId>tagsoup</artifactId>
-		  <version>1.2</version>
+			<groupId>org.ccil.cowan.tagsoup</groupId>
+			<artifactId>tagsoup</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>1.4</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.0.1</version>
 		</dependency>
-	    <dependency>
-	      <groupId>commons-lang</groupId>
-	      <artifactId>commons-lang</artifactId>
-	      <version>2.5</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>uk.ac.cam.ch.opsin</groupId>
-	      <artifactId>opsin-core</artifactId>
-	      <version>2.0-SNAPSHOT</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>uk.ac.cam.ch.opsin</groupId>
-	      <artifactId>opsin-inchi</artifactId>
-	      <version>2.0-SNAPSHOT</version>
-	    </dependency>
-      <dependency>
-        <groupId>xom</groupId>
-        <artifactId>xom</artifactId>
-        <version>1.2.3</version>
-      </dependency>
 		<dependency>
-	      <groupId>junit</groupId>
-	      <artifactId>junit</artifactId>
-	      <version>4.7</version>
-	  	  <scope>test</scope>
-	    </dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.cam.ch.opsin</groupId>
+			<artifactId>opsin-core</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.cam.ch.opsin</groupId>
+			<artifactId>opsin-inchi</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.3</version>
+			</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
