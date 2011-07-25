@@ -397,4 +397,14 @@ public class TestChemicalNameDetection {
 		assertEquals("benzene acetate", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
+	
+	@Test
+	public void intendedSpace3() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("acetic anhydride");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("acetic anhydride", identifiedNames.get(0).getChemicalName());
+		assertEquals("acetic anhydride", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
 }
