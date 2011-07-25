@@ -76,28 +76,30 @@ public class DocumentToStructures {
 			else{
 				String uninterpretableName = prr.getUninterpretableName();
 				String uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
-				if (uninterpretedWordSection.length() >=2 || (uninterpretedWordSection.length() ==1 && (Character.isLetter(uninterpretedWordSection.charAt(0)) || Character.isDigit(uninterpretedWordSection.charAt(0))))){
-					//uninterpretable as is
-					SpaceRemovalResult srr =attemptSpaceRemoval(normalisedWords, i, uninterpretableName, stringToTest, wordsLength);
-					if (srr.isSuccess()){
-						prr = srr.getParseRulesResults();
-						uninterpretableName = prr.getUninterpretableName();
-						uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
-						spacesRemoved +=srr.getSpacesRemoved();
+				if (!nextWordAppearsInterpretable(uninterpretableName)){
+					if (uninterpretedWordSection.length() >=2 || (uninterpretedWordSection.length() ==1 && (Character.isLetter(uninterpretedWordSection.charAt(0)) || Character.isDigit(uninterpretedWordSection.charAt(0))))){
+						//uninterpretable as is
+						SpaceRemovalResult srr =attemptSpaceRemoval(normalisedWords, i, uninterpretableName, stringToTest, wordsLength);
+						if (srr.isSuccess()){
+							prr = srr.getParseRulesResults();
+							uninterpretableName = prr.getUninterpretableName();
+							uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
+							spacesRemoved +=srr.getSpacesRemoved();
+						}
+						else if(!fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection)){//generally name is uninterpretable but exception made for a full name followed by a bracket e.g. pyridine(5ml)
+							chemicalNameBuffer = new StringBuilder();
+							continue;
+						}
 					}
-					else if(!fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection)){//generally name is uninterpretable but exception made for a full name followed by a bracket e.g. pyridine(5ml)
-						chemicalNameBuffer = new StringBuilder();
-						continue;
-					}
-				}
-				else if (isFullWord(prr) && !nextWordIsFullWord(normalisedWords, i, uninterpretableName, wordsLength)){
-					//e.g. benzene sulfonamide
-					SpaceRemovalResult srr =attemptSpaceRemoval(normalisedWords, i, uninterpretableName, stringToTest, wordsLength);
-					if (srr.isSuccess()){
-						prr = srr.getParseRulesResults();
-						uninterpretableName = prr.getUninterpretableName();
-						uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
-						spacesRemoved +=srr.getSpacesRemoved();
+					else if (isFullWord(prr) && !nextWordIsFullWord(normalisedWords, i, uninterpretableName, wordsLength)){
+						//e.g. benzene sulfonamide
+						SpaceRemovalResult srr =attemptSpaceRemoval(normalisedWords, i, uninterpretableName, stringToTest, wordsLength);
+						if (srr.isSuccess()){
+							prr = srr.getParseRulesResults();
+							uninterpretableName = prr.getUninterpretableName();
+							uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
+							spacesRemoved +=srr.getSpacesRemoved();
+						}
 					}
 				}
 				if (!chemicalNameBuffer.toString().equals("")){
@@ -129,6 +131,13 @@ public class DocumentToStructures {
 			identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice, words));
 		}
 		return identifiedChemicalNames;
+	}
+
+	private static boolean nextWordAppearsInterpretable(String uninterpretableName) {
+		if (uninterpretableName.startsWith(" ")){
+			uninterpretableName = uninterpretableName.substring(1);
+		}
+		return getParses(uninterpretableName).getUninterpretableName().length() <=1;
 	}
 
 	private static boolean nextWordIsFullWord(String[] normalisedWords, int i,String uninterpretableName, int wordsLength) {
