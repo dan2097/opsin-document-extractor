@@ -1,6 +1,7 @@
 package org.bitbucket.dan2097.structureExtractor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,8 @@ public class DocumentToStructures {
 	private static final char END_OF_MAINGROUP = '\u00e2';
 	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
 	private static ParseRules pr;
+	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
+	private static final List<String> stopWords = Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in");
 
 	static{
 		try {
@@ -46,10 +49,7 @@ public class DocumentToStructures {
 	public static List<IdentifiedChemicalName> extractNames(String[] words){
 		List<IdentifiedChemicalName> identifiedChemicalNames = new ArrayList<IdentifiedChemicalName>();
 		int wordsLength =words.length;
-		String[] normalisedWords = new String[wordsLength];
-		for (int i = wordsLength -1; i >=0; i--) {
-			normalisedWords[i] = PreProcesssor.preProcess(words[i]);
-		}
+		String[] normalisedWords = generateNormalisedWords(words);
 		StringBuilder chemicalNameBuffer = new StringBuilder();//holds the current chemical name under consideration
 		int totalSpacesRemoved =0;//running total of spaces removed for the current name
 		for (int i = 0; i < wordsLength; i++) {
@@ -131,6 +131,41 @@ public class DocumentToStructures {
 			identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice, words));
 		}
 		return identifiedChemicalNames;
+	}
+
+	/**
+	 * Runs the preprocessor over the list of words and markups up stop words with exclamation marks to prevent their recognition
+	 * @param words
+	 * @return
+	 */
+	private static String[] generateNormalisedWords(String[] words) {
+		int wordsLength = words.length;
+		String[] normalisedWords = new String[wordsLength];
+		for (int i = 0; i < wordsLength; i++) {
+			String word = PreProcesssor.preProcess(words[i]);
+			if (stopWords.contains(word.toLowerCase()) && !periodicSpecialCase(word, words, i)){
+				word = '!' + word + '!';
+			}
+			normalisedWords[i] = word;
+		}
+		return normalisedWords;
+	}
+
+	/**
+	 * periodic can be chemical if followed by a suitable word
+	 * @param word
+	 * @param i 
+	 * @param words 
+	 * @return
+	 */
+	private static boolean periodicSpecialCase(String word, String[] words, int i) {
+		if (word.equals("periodic") && i+1 < words.length){
+			String nextWord  = words[i+1];
+			if (nextWord.equalsIgnoreCase("acid") || isFunctionalWord(getParses(nextWord))){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean nextWordAppearsInterpretable(String uninterpretableName) {
@@ -325,10 +360,10 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="ethylene glycol, Propylene glycol, 1,3- propanediol, 1,2-butanediol, 1,3-butanediol, 1,4-butanediol, 2,3-butanediol, 1,2-pentanediol, 1,5-pentanediol, 1,2-hexanediol, 1,6-hexanediol, 1,2-heptanediol, 1,7-heptanediol, 1,2-octanediol, 1,8-octanediol, 1,2-decanediol, 1,10-decanediol, 3-methyl-1,2-butanediol, 3,3-dimethyl-1,2-butanediol, 4-methyl-1,2-pentanediol, 5-methyl-1,2-hexanediol, 3-chloro- 1,2-propanediol, 3-butene-1,2-diol, 4-pentene-1,2-diol, 1-phenylethane-1,2-diol, 1-(4-methylphenyl)ethane-1,2-diol, 1-(4-methoxyphenyl)ethane-1,2-diol, 1-(4-chlorophenyl)ethane-1,2-diol, 1-(4-nitrophenyl)ethane-1,2-diol, 1-cyclohexylethane- 1,2-diol, 1,2-cyclohexanediol,";
+		String input ="periodic boundary";
 		List<IdentifiedChemicalName> identifiedNames = extractNames(matchWhiteSpace.split(input));
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
-			System.out.println(identifiedChemicalName.getTextValue());
+			System.out.println(identifiedChemicalName.getChemicalName());
 		}
 	}
 }
