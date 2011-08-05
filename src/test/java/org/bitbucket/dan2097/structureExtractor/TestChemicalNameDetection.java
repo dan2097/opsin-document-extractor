@@ -407,4 +407,57 @@ public class TestChemicalNameDetection {
 		assertEquals("acetic anhydride", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
+	
+	@Test
+	public void nonChemicalButOpsinParsable1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("period");//german for periodo
+		assertEquals(0, identifiedNames.size());
+	}
+
+	@Test
+	public void nonChemicalButOpsinParsable2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("periodic");//periodic acid
+		assertEquals(0, identifiedNames.size());
+		identifiedNames = DocumentToStructures.extractNames("periodic acid");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("periodic acid", identifiedNames.get(0).getChemicalName());
+		assertEquals("periodic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+
+	@Test
+	public void nonChemicalButOpsinParsable3() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("then on");
+		assertEquals(0, identifiedNames.size());
+	}
+
+	@Test
+	public void nonChemicalButOpsinParsable4() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("then one");
+		assertEquals(0, identifiedNames.size());
+	}
+
+	@Test
+	public void nonChemicalButOpsinParsable5() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("then it");
+		assertEquals(0, identifiedNames.size());
+	}
+
+	@Test
+	public void nonChemicalButOpsinParsable6() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("then at");
+		assertEquals(0, identifiedNames.size());
+	}
+	
+	@Test
+	public void nonChemicalButOpsinParsable7() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("prism an");
+		assertEquals(0, identifiedNames.size());
+	}
+	
+	@Test
+	public void nonChemicalButOpsinParsable8() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("val in");
+		assertEquals(0, identifiedNames.size());
+	}
 }
