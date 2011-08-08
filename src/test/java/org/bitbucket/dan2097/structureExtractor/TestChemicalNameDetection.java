@@ -407,6 +407,22 @@ public class TestChemicalNameDetection {
 		assertEquals("acetic anhydride", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
+
+	@Test
+	public void intendedSpace4() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("8 heptane");
+		assertEquals(1, identifiedNames.size());
+		assertEquals("heptane", identifiedNames.get(0).getChemicalName());
+		assertEquals("heptane", identifiedNames.get(0).getTextValue());
+		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void pluralChemical() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames("hexanes");
+		assertEquals(0, identifiedNames.size());
+	}
 	
 	@Test
 	public void nonChemicalButOpsinParsable1() throws Exception{
