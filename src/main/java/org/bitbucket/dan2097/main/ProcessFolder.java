@@ -62,7 +62,7 @@ public class ProcessFolder {
 			Document doc = XMLFileToXMLDocument.readXMLFileUsingHtmlTagSoup(inputFile);
 			List<String> chunks = xmlDocumentToString.convertDocumentToNewLineDelimitedList(doc);
 			for (String chunk : chunks) {
-				List<IdentifiedChemicalName> identifiedNames = DocumentToStructures.extractNames(chunk);
+				List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(chunk).extractNames();
 				//writer2.append(chunk +"\n");
 				for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 					OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getChemicalName());
