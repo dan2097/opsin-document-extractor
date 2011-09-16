@@ -51,6 +51,22 @@ public class DocumentToStructures {
 		wordsLength = words.length;
 		normalisedWords = generateNormalisedWords();
 	}
+	
+	/**
+	 * These are the words given as input to the program
+	 * @return
+	 */
+	public String[] getWords() {
+		return words;
+	}
+
+	/**
+	 * These are the normalised words the program actually operated on
+	 * @return
+	 */
+	String[] getNormalisedWords() {
+		return normalisedWords;
+	}
 
 	/**
 	 * Extracts chemical names that are parsable by OPSIN
@@ -259,6 +275,9 @@ public class DocumentToStructures {
 	}
 
 	private boolean fullWordImmediatelyFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {
+		if (uninterpretedWordSection.length() <1){
+			return false;
+		}
 		//exception made for full chemical followed by bracketed section
 		Character firstLetter= uninterpretedWordSection.charAt(0);
 		if (isFullWord(prr) && isOpenBracket(firstLetter)){
