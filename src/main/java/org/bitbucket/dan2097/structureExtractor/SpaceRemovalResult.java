@@ -6,10 +6,10 @@ package org.bitbucket.dan2097.structureExtractor;
 import uk.ac.cam.ch.wwmm.opsin.ParseRulesResults;
 
 class SpaceRemovalResult{
-	final boolean success;
-	final ParseRulesResults parseRulesResults;
-	final String inputString;
-	final Integer spacesRemoved;
+	private final boolean success;
+	private final ParseRulesResults parseRulesResults;
+	private final String inputString;
+	private final Integer spacesRemoved;
 
 	public SpaceRemovalResult(boolean success, ParseRulesResults prr, String inputString, Integer spacesRemoved) {
 		this.success = success;
