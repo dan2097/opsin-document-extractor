@@ -126,17 +126,28 @@ public class DocumentToStructures {
 						continue;
 					}
 				}
-				boolean nextWordAppearsUninterpretable = false;
-				if (nextWord !=null){
-					nextWordAppearsUninterpretable = wordAppearsUninterpretable(nextWord);
-				}
-				if (nextWordAppearsUninterpretable && isASpecialCaseWhereSpaceRemovalShouldBeAttempted(prr, nextWord)){
-					//e.g. benzene sulfonamide
-					SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest);
-					if (srr.isSuccess()){
-						prr = srr.getParseRulesResults();
-						uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
-						spacesRemoved +=srr.getSpacesRemoved();
+				while (true){//allows this to be called recursively, probably should replace with a more elegant way of doing this
+					boolean nextWordAppearsUninterpretable = false;
+					if (nextWord !=null){
+						nextWordAppearsUninterpretable = wordAppearsUninterpretable(nextWord);
+					}
+					if (nextWordAppearsUninterpretable && isASpecialCaseWhereSpaceRemovalShouldBeAttempted(prr, nextWord)){
+						//e.g. benzene sulfonamide
+						SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest);
+						if (srr.isSuccess()){
+							prr = srr.getParseRulesResults();
+							uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
+							spacesRemoved +=srr.getSpacesRemoved();
+							indiceOfNextUnusedWord += srr.getSpacesRemoved();
+							stringToTest = srr.getInputString();
+							nextWord = indiceOfNextUnusedWord < wordsLength ? normalisedWords[indiceOfNextUnusedWord] : null;
+						}
+						else{
+							break;
+						}
+					}
+					else{
+						break;
 					}
 				}
 
