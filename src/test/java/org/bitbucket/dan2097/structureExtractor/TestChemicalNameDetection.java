@@ -399,6 +399,16 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
+	public void erroneousSpaces10() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("5-amino-2-[2- (4-methoxyphenyl) vinyl] -4,6-dimorpholinopyrimidine").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("5-amino-2-[2-(4-methoxyphenyl) vinyl]-4,6-dimorpholinopyrimidine", identifiedNames.get(0).getChemicalName());
+		assertEquals("5-amino-2-[2- (4-methoxyphenyl) vinyl] -4,6-dimorpholinopyrimidine", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(3, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
 	public void intendedSpace1() throws Exception{
 		//counter example
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("benzene ethane").extractNames();
