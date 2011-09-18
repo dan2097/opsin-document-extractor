@@ -2,7 +2,6 @@ package org.bitbucket.dan2097.structureExtractor;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
@@ -390,14 +389,13 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
-	@Ignore
 	public void erroneousSpaces9() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("2-ethyl-1-ben ze ne -ethanol").extractNames();
 		assertEquals(1, identifiedNames.size());
 		assertEquals("2-ethyl-1-benzene-ethanol", identifiedNames.get(0).getChemicalName());
 		assertEquals("2-ethyl-1-ben ze ne -ethanol", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
-		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(3, identifiedNames.get(0).getWordPositionEndIndice());
 	}
 	
 	@Test
