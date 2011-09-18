@@ -140,7 +140,7 @@ public class DocumentToStructures {
 				if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 					i++;
 				}
-				i = i +spacesRemoved;
+				i += spacesRemoved;
 				if ((uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) )|| fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
 					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
@@ -226,13 +226,7 @@ public class DocumentToStructures {
 			nextWord = nextWord.substring(1);
 		}
 		String uninterpretedWordSection = getParses(nextWord).getUninterpretableName();
-		if (uninterpretedWordSection.length()==0){
-			return true;
-		}
-		else if (uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0))){
-			return true;
-		}
-		return false;
+		return isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection);
 	}
 
 	private String getNextWord(int i,String uninterpretableName) {
