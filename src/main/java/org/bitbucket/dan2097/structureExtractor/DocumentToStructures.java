@@ -17,6 +17,7 @@ public class DocumentToStructures {
 	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
 	private static final char END_OF_MAINGROUP = '\u00e2';
 	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
+	private static final char END_OF_SUBSTITUENT = '\u00e9';
 	private static ParseRules pr;
 	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
 	private static final List<String> stopWords = Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in");
@@ -106,7 +107,7 @@ public class DocumentToStructures {
 				String uninterpretableName = prr.getUninterpretableName();
 				String uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
 				if (!nextWordAppearsInterpretable(uninterpretableName)){
-					if (uninterpretedWordSection.length() >=2 || (uninterpretedWordSection.length() ==1 && Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)))){
+					if (!isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection)){
 						//uninterpretable as is
 						SpaceRemovalResult srr =attemptSpaceRemoval(i, uninterpretableName, stringToTest);
 						if (srr.isSuccess()){
@@ -120,7 +121,7 @@ public class DocumentToStructures {
 							continue;
 						}
 					}
-					else if (isFullWord(prr) && !nextWordIsFullWord(i, uninterpretableName)){
+					else if (specialCaseWhereSpaceRemovalShouldBeAttempted(prr, i)){
 						//e.g. benzene sulfonamide
 						SpaceRemovalResult srr =attemptSpaceRemoval(i, uninterpretableName, stringToTest);
 						if (srr.isSuccess()){
@@ -160,6 +161,23 @@ public class DocumentToStructures {
 			identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
 		}
 		return identifiedChemicalNames;
+	}
+
+	private boolean specialCaseWhereSpaceRemovalShouldBeAttempted(ParseRulesResults prr, int i) {
+		String uninterpretableName = prr.getUninterpretableName();
+		String nextWord = getNextWord(i, uninterpretableName);
+		if (isFullWord(prr) && !isFullWord(getParses(nextWord))){
+			//e.g. benzene sulfonamide
+			return true;
+		}
+		else if (isSubstituentWord(prr) && nextWord.startsWith("-")){
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isEmptyStringOrSinglePunctuationCharacter(String uninterpretedWordSection) {
+		return uninterpretedWordSection.length() ==0 || (uninterpretedWordSection.length() ==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)));
 	}
 
 	private static boolean isMadeOfDigits(String word) {
@@ -217,18 +235,15 @@ public class DocumentToStructures {
 		return false;
 	}
 
-	private boolean nextWordIsFullWord(int i,String uninterpretableName) {
-		String secondWord =null;
+	private String getNextWord(int i,String uninterpretableName) {
+		String nextWord =null;
 		if (matchWhiteSpace.split(uninterpretableName).length==2 && (i+1)<wordsLength){
-			secondWord = normalisedWords[i+1];
+			nextWord = normalisedWords[i+1];
 		}
 		else if ((i+2)<wordsLength){
-			secondWord = normalisedWords[i+2];
+			nextWord = normalisedWords[i+2];
 		}
-		if (secondWord!=null){
-			return isFullWord(getParses(secondWord));
-		}
-		return false;
+		return nextWord;
 	}
 
 	private ParseRulesResults getParses(String stringToTest) {
@@ -247,7 +262,7 @@ public class DocumentToStructures {
 			uninterpretableName = prr.getUninterpretableName();
 			String uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
 			spacesRemoved++;
-			if (uninterpretedWordSection.length() ==0 || (uninterpretedWordSection.length() ==1  && normalisedWords[i+1].length() > 1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)))){
+			if (isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection)){
 				return new SpaceRemovalResult(true, spacesRemoved, prr);
 			}
 		}
@@ -265,7 +280,7 @@ public class DocumentToStructures {
 			uninterpretableName = prr.getUninterpretableName();
 			String uninterpretedWordSection = matchWhiteSpace.split(uninterpretableName)[0];
 			spacesRemoved++;
-			if (uninterpretedWordSection.length() ==0 || (uninterpretedWordSection.length() ==1 && normalisedWords[indiceTojoin].length() > 1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)))){
+			if (isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection)){
 				return new SpaceRemovalResult(true, spacesRemoved, prr);
 			}
 			indiceTojoin++;
@@ -313,6 +328,23 @@ public class DocumentToStructures {
 		return finalAnnotation.equals(END_OF_MAINGROUP);
 	}
 	
+	/**
+	 * Determines whether a parse rules results describes a "substituent" word by checking whether the final annotation is an END_OF_SUBSTITUENT
+	 * @param prr
+	 * @return
+	 */
+	private boolean isSubstituentWord(ParseRulesResults prr) {
+		if (prr.getParseTokensList().size()==0){
+			return false;
+		}
+		List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
+		if (annotations.size()==0){
+			return false;
+		}
+		Character finalAnnotation = annotations.get(annotations.size() -1);
+		return finalAnnotation.equals(END_OF_SUBSTITUENT);
+	}
+
 	/**
 	 * Determines whether a parse rules results describes a "functional" word by checking whether the final annotation is an END_OF_FUNCTIONALTERM
 	 * @param prr
@@ -404,7 +436,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="ethyl-ben ze ne -ethanol";
+		String input ="2-ethyl-1-ben ze ne -ethanol";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
