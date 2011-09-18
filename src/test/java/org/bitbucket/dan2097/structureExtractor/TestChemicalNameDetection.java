@@ -380,12 +380,22 @@ public class TestChemicalNameDetection {
 	}
 
 	@Test
-	@Ignore
 	public void erroneousSpaces8() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("1-ethyl -2-methyl-benzene").extractNames();
 		assertEquals(1, identifiedNames.size());
 		assertEquals("1-ethyl-2-methyl-benzene", identifiedNames.get(0).getChemicalName());
 		assertEquals("1-ethyl -2-methyl-benzene", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	@Ignore
+	public void erroneousSpaces9() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("2-ethyl-1-ben ze ne -ethanol").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("2-ethyl-1-benzene-ethanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("2-ethyl-1-ben ze ne -ethanol", identifiedNames.get(0).getTextValue());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 	}
