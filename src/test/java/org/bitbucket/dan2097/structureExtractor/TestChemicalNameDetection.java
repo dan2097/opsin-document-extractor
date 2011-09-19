@@ -459,6 +459,16 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
+	public void intendedSpace5() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("acetic acid (8)").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("acetic acid", identifiedNames.get(0).getChemicalName());
+		assertEquals("acetic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
 	public void pluralChemical() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("hexanes").extractNames();
 		assertEquals(0, identifiedNames.size());
