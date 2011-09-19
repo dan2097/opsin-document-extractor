@@ -110,7 +110,7 @@ public class DocumentToStructures {
 				String nextWord = indiceOfNextUnusedWord < wordsLength ? normalisedWords[indiceOfNextUnusedWord] : null;
 				if (!isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection)){
 					//uninterpretable as is
-					SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest);
+					SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest, prr.getUninterpretableName());
 					if (srr.isSuccess()){
 						prr = srr.getParseRulesResults();
 						uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
@@ -133,7 +133,7 @@ public class DocumentToStructures {
 					}
 					if (nextWordAppearsUninterpretable && isASpecialCaseWhereSpaceRemovalShouldBeAttempted(prr, nextWord)){
 						//e.g. benzene sulfonamide
-						SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest);
+						SpaceRemovalResult srr =attemptSpaceRemoval(indiceOfNextUnusedWord, stringToTest, prr.getUninterpretableName());
 						if (srr.isSuccess()){
 							prr = srr.getParseRulesResults();
 							uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
@@ -251,11 +251,20 @@ public class DocumentToStructures {
 		}
 	}
 
-	private SpaceRemovalResult attemptSpaceRemoval(int indiceOfNextUnusedWord, String stringToTest) {
+	/**
+	 * Attempts to remove spaces to produce something that is interpretable.
+	 * If uninterpretableName contains a space then the space within stringToTest may be removed
+	 * Otherwise starts joining words starting at indiceOfNextUnusedWord
+	 * @param indiceOfNextUnusedWord
+	 * @param stringToTest
+	 * @param uninterpretableName
+	 * @return
+	 */
+	private SpaceRemovalResult attemptSpaceRemoval(int indiceOfNextUnusedWord, String stringToTest, String uninterpretableName) {
 		int spacesRemoved = 0;
 		int indiceTojoin = indiceOfNextUnusedWord;
-		String[] stringToTestArray = matchWhiteSpace.split(stringToTest);
-		if (stringToTestArray.length==2){//is the space between the words erroneous
+		if (matchWhiteSpace.split(uninterpretableName).length==2){//is the space between the words erroneous
+			String[] stringToTestArray = matchWhiteSpace.split(stringToTest);
 			stringToTest = stringToTestArray[0] + stringToTestArray[1];
 			ParseRulesResults prr = getParses(stringToTest);
 			String uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
@@ -433,7 +442,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="5-amino-2- [2- (4-methoxyphenyl) vinyl] -4- (4-methylpiperazin-1-yl) -6-morpholino pyrimidine";
+		String input ="eth ylethyl -2 -methyl";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
