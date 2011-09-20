@@ -122,8 +122,9 @@ public class DocumentToStructures {
 						stringToTest = srr.getInputString();
 						nextWord = indiceOfNextUnusedWord < wordsLength ? normalisedWords[indiceOfNextUnusedWord] : null;
 					}
-					else if (!fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection)){
+					else if (!fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection) && !isAnUninterpretableS(uninterpretedWordSection)){
 						//exception made for a full name followed by a bracket e.g. pyridine(5ml
+						//exception made for a class names e.g. pyridines
 						//otherwise the name was still uninterpretable even after space removal and hence is rejected
 						chemicalNameBuffer = new StringBuilder();
 						continue;
@@ -157,17 +158,22 @@ public class DocumentToStructures {
 					chemicalNameBuffer.append(" ");
 				}
 				String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
-				adjustCurrentNameType(prr);
+				boolean endsInUninterpretableS = isAnUninterpretableS(uninterpretedWordSection);
+				adjustCurrentNameType(prr, endsInUninterpretableS);
 				chemicalNameBuffer.append(parsedOpsinNormalisedText);
 				if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 					i++;
 				}
 				i += spacesRemoved;
 				if (currentNameType == NameType.family || 
-						i +1==wordsLength || 
+						i +1==wordsLength ||
+						endsInUninterpretableS ||
 						(uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) ) ||
 						fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
+					if (endsInUninterpretableS){
+						name+='s';
+					}
 					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int finalIndice = i;
 					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
@@ -184,11 +190,31 @@ public class DocumentToStructures {
 	}
 
 	/**
+	 * Is the uninterpretedWordSection an s e.g. the s of pyridines
+	 * s followed by punctuation is also allowed
+	 * @param uninterpretedWordSection
+	 * @return
+	 */
+	private boolean isAnUninterpretableS(String uninterpretedWordSection) {
+		if (uninterpretedWordSection.length()==1){
+			return uninterpretedWordSection.charAt(0)=='s';
+		}
+		if (uninterpretedWordSection.length()==2 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(1))){
+			return uninterpretedWordSection.charAt(0)=='s';
+		}
+		return false;
+	}
+
+	/**
 	 * Checks what word type/s are included in the current prr and adjusts the currentNameType accordingly
 	 * @param prr
+	 * @param endsInUninterpretableS 
 	 */
-	private void adjustCurrentNameType(ParseRulesResults prr) {
-		if (prr.getParseTokensList().size()>0){
+	private void adjustCurrentNameType(ParseRulesResults prr, boolean endsInUninterpretableS) {
+		if (endsInUninterpretableS){
+			currentNameType = NameType.family;
+		}
+		else if (prr.getParseTokensList().size()>0){
 			List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
 			String firsToken = (prr.getParseTokensList().get(0).getTokens().size() > 0) ? prr.getParseTokensList().get(0).getTokens().get(0) :"";
 			for (Character annotation : annotations) {
@@ -489,7 +515,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="the hydrazone [(3-chlorophenyl)hydrazono]malononitrile";
+		String input ="pyridines";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());

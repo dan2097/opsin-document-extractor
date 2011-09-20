@@ -88,6 +88,46 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
+	public void testFamily2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("alcohols").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("alcohols", identifiedNames.get(0).getChemicalName());
+		assertEquals("alcohols", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testFamily3() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("pyridines").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("pyridines", identifiedNames.get(0).getChemicalName());
+		assertEquals("pyridines", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testFamily4() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("ethyloxazolones").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethyloxazolones", identifiedNames.get(0).getChemicalName());
+		assertEquals("ethyloxazolones", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testFamily5() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("(pyridines)").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("pyridines", identifiedNames.get(0).getChemicalName());
+		assertEquals("(pyridines)", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
 	public void testPart1() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("ethyl").extractNames();
 		assertEquals(1, identifiedNames.size());
@@ -128,6 +168,18 @@ public class TestChemicalNameDetection {
 		assertEquals(NameType.polymer, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void testPolymer3() throws Exception{
+		//OPSIN doesn't actually understand polystyrene, but it understands poly and styrene!
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("polystyrene").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("polystyrene", identifiedNames.get(0).getChemicalName());
+		assertEquals("polystyrene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.polymer, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
 	}
 	
 	@Test
@@ -592,13 +644,7 @@ public class TestChemicalNameDetection {
 		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
-	
-	@Test
-	public void pluralChemical() throws Exception{
-		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("hexanes").extractNames();
-		assertEquals(0, identifiedNames.size());
-	}
-	
+
 	@Test
 	public void nonChemicalButOpsinParsable1() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("period").extractNames();//german for periodo
