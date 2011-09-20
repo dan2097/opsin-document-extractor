@@ -124,7 +124,7 @@ public class DictionaryLookup {
 			StringBuilder rawTextName = new StringBuilder(words[firstWordToConsider]);
 			identifiedNames = new ArrayList<IdentifiedChemicalName>();
 			if (currentHashHolder.isTerminal()){
-				identifiedNames.add(new IdentifiedChemicalName(firstWordToConsider, firstWordToConsider, normalisedName.toString(), rawTextName.toString()));
+				identifiedNames.add(new IdentifiedChemicalName(firstWordToConsider, firstWordToConsider, normalisedName.toString(), rawTextName.toString(), NameType.complete));
 			}
 			for (int i = firstWordToConsider +1; i < normalisedWords.length; i++) {
 				Map<String, HashHolder> wordToHashHolderMap = currentHashHolder.getWordToHashHolderMap();
@@ -136,7 +136,7 @@ public class DictionaryLookup {
 						rawTextName.append(' ');
 						rawTextName.append(words[i]);
 						if (currentHashHolder.isTerminal()){
-							identifiedNames.add(new IdentifiedChemicalName(firstWordToConsider, i, normalisedName.toString(), rawTextName.toString()));
+							identifiedNames.add(new IdentifiedChemicalName(firstWordToConsider, i, normalisedName.toString(), rawTextName.toString(), NameType.complete));
 						}
 					}
 					else{

@@ -25,6 +25,8 @@ public class DocumentToStructures {
 	private final String[] words;
 	private final int wordsLength;
 	private final String[] normalisedWords;
+	
+	private NameType currentNameType = null;
 
 	static{
 		try {
@@ -100,6 +102,7 @@ public class DocumentToStructures {
 					int finalIndice = i -1;
 					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
 					chemicalNameBuffer = new StringBuilder();
+					currentNameType = null;
 				}
 				totalSpacesRemoved =0;
 			}
@@ -150,22 +153,26 @@ public class DocumentToStructures {
 						break;
 					}
 				}
-
 				if (!chemicalNameBuffer.toString().equals("")){
 					chemicalNameBuffer.append(" ");
 				}
 				String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
+				adjustCurrentNameType(prr);
 				chemicalNameBuffer.append(parsedOpsinNormalisedText);
 				if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 					i++;
 				}
 				i += spacesRemoved;
-				if ((uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) )|| fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
+				if (currentNameType == NameType.family || 
+						i +1==wordsLength || 
+						(uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) ) ||
+						fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
 					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int finalIndice = i;
 					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
 					chemicalNameBuffer = new StringBuilder();
+					currentNameType = null;
 					totalSpacesRemoved =0;
 				}
 				else{
@@ -173,13 +180,53 @@ public class DocumentToStructures {
 				}
 			}
 		}
-		if (!chemicalNameBuffer.toString().equals("")){
-			String name =chemicalNameBuffer.toString();
-			int startingIndice = wordsLength - (matchWhiteSpace.split(name).length + totalSpacesRemoved);
-			int finalIndice = wordsLength -1;
-			identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
-		}
 		return identifiedChemicalNames;
+	}
+
+	/**
+	 * Checks what word type/s are included in the current prr and adjusts the currentNameType accordingly
+	 * @param prr
+	 */
+	private void adjustCurrentNameType(ParseRulesResults prr) {
+		if (prr.getParseTokensList().size()>0){
+			List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
+			String firsToken = (prr.getParseTokensList().get(0).getTokens().size() > 0) ? prr.getParseTokensList().get(0).getTokens().get(0) :"";
+			for (Character annotation : annotations) {
+				if (annotation.equals(END_OF_MAINGROUP) || annotation.equals(END_OF_SUBSTITUENT) || annotation.equals(END_OF_FUNCTIONALTERM)){
+					if (currentNameType == null){
+						if (annotation.equals(END_OF_MAINGROUP)){
+							currentNameType = NameType.complete;
+						}
+						else if (annotation.equals(END_OF_SUBSTITUENT)){
+							currentNameType = NameType.part;
+						}
+						else if (firsToken.equals("poly") || firsToken.equals("oligo")){
+							currentNameType = NameType.polymer;
+						}
+						else{
+							currentNameType = NameType.family;
+						}
+					}
+					else if (currentNameType == NameType.part){
+						if (annotation.equals(END_OF_MAINGROUP)){
+							currentNameType = NameType.complete;
+						}
+						else if (annotation.equals(END_OF_SUBSTITUENT)){
+							currentNameType = NameType.part;
+						}
+						else{
+							currentNameType = NameType.complete;
+						}
+					}
+					else if (currentNameType == NameType.family &&
+							(annotation.equals(END_OF_MAINGROUP) || annotation.equals(END_OF_SUBSTITUENT))){
+						//might in the future occur for CAS names
+						currentNameType = NameType.complete;
+					}
+					//NameType.complete and NameType.polymer just stays as is
+				}
+			}
+		}
 	}
 
 	private boolean isASpecialCaseWhereSpaceRemovalShouldBeAttempted(ParseRulesResults prr, String nextWord) {
@@ -429,7 +476,7 @@ public class DocumentToStructures {
 		if (endBracketRemoved && words[finalIndice].length()==1 && isCloseBracket(words[finalIndice].charAt(0))){
 			finalIndice--;
 		}
-		return new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(startingIndice, finalIndice));
+		return new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(startingIndice, finalIndice), currentNameType);
 	}
 
 	private String extractRawText(int startingIndice, int finalIndice) {
@@ -442,7 +489,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="eth ylethyl -2 -methyl";
+		String input ="the hydrazone [(3-chlorophenyl)hydrazono]malononitrile";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());

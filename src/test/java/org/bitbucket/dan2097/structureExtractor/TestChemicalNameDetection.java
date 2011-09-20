@@ -13,6 +13,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("propane", identifiedNames.get(0).getChemicalName());
 		assertEquals("propane", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -22,6 +23,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethyl chloride", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethyl chloride", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -31,6 +33,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethylchloride", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethylchloride", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -40,6 +43,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -49,6 +53,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("acetic acid", identifiedNames.get(0).getChemicalName());
 		assertEquals("acetic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -58,6 +63,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("vitamin c", identifiedNames.get(0).getChemicalName());
 		assertEquals("vitamin C", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -67,7 +73,61 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("carbonyl cyanide m-chlorophenyl hydrazone", identifiedNames.get(0).getChemicalName());
 		assertEquals("Carbonyl cyanide m-chlorophenyl hydrazone", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testFamily1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("alcohol").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("alcohol", identifiedNames.get(0).getChemicalName());
+		assertEquals("alcohol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testPart1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("ethyl").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("ethyl", identifiedNames.get(0).getChemicalName());
+		assertEquals("ethyl", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+	}
+	
+	@Test
+	public void testPart2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("3-methyl butyl").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("3-methyl butyl", identifiedNames.get(0).getChemicalName());
+		assertEquals("3-methyl butyl", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void testPolymer1() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("polyethylene").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("polyethylene", identifiedNames.get(0).getChemicalName());
+		assertEquals("polyethylene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.polymer, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void testPolymer2() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("poly ethylene").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("poly ethylene", identifiedNames.get(0).getChemicalName());
+		assertEquals("poly ethylene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.polymer, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 	}
 	
 	@Test
@@ -76,6 +136,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -85,6 +146,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethanoic acid ethyl ester", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(4, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -94,6 +156,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethyl-isopropyl-ether", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethyl-isopropyl-ether", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -103,6 +166,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("2,2-bis[4-(methacryloxyethoxy)phenyl]propane", identifiedNames.get(0).getChemicalName());
 		assertEquals("2,2-Bis[4-(methacryloxyethoxy)phenyl]propane:", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -112,6 +176,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethyl chloride", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethyl chloride:", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -121,6 +186,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("butane", identifiedNames.get(0).getChemicalName());
 		assertEquals("butane.", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -130,6 +196,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethyl chloride", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethyl chloride.", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -141,6 +208,8 @@ public class TestChemicalNameDetection {
 		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getTextValue());
 		assertEquals("caffeine", identifiedNames.get(1).getChemicalName());
 		assertEquals("(caffeine)", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
 		assertEquals(1, identifiedNames.get(1).getWordPositionStartIndice());
@@ -155,6 +224,8 @@ public class TestChemicalNameDetection {
 		assertEquals("1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione", identifiedNames.get(0).getTextValue());
 		assertEquals("caffeine", identifiedNames.get(1).getChemicalName());
 		assertEquals("caffeine", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
 		assertEquals(2, identifiedNames.get(1).getWordPositionStartIndice());
@@ -169,6 +240,8 @@ public class TestChemicalNameDetection {
 		assertEquals("water", identifiedNames.get(1).getChemicalName());
 		assertEquals("(1,3,7-trimethyl-1H-purine-2,6(3H,7H)-dione:", identifiedNames.get(0).getTextValue());
 		assertEquals("water:", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(5, identifiedNames.get(1).getWordPositionStartIndice());
 	}
@@ -179,6 +252,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("tetrahydrofuran", identifiedNames.get(0).getChemicalName());
 		assertEquals("(tetrahydrofuran)", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -188,6 +262,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("tetrahydrofuran", identifiedNames.get(0).getChemicalName());
 		assertEquals("tetrahydrofuran", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 	}
@@ -200,6 +275,8 @@ public class TestChemicalNameDetection {
 		assertEquals("dimethyl ether", identifiedNames.get(0).getTextValue());
 		assertEquals("methoxymethane", identifiedNames.get(1).getChemicalName());
 		assertEquals("(methoxymethane)", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 		assertEquals(2, identifiedNames.get(1).getWordPositionStartIndice());
@@ -212,6 +289,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene(", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -221,6 +299,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene(50", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -240,6 +319,12 @@ public class TestChemicalNameDetection {
 		assertEquals("ethyl chloride,", identifiedNames.get(3).getTextValue());
 		assertEquals("propyl bromide", identifiedNames.get(4).getTextValue());
 		assertEquals("butyl chloride.", identifiedNames.get(5).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(2).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(3).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(4).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(5).getNameType());
 		assertEquals(7, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(8, identifiedNames.get(1).getWordPositionStartIndice());
 		assertEquals(9, identifiedNames.get(2).getWordPositionStartIndice());
@@ -263,7 +348,13 @@ public class TestChemicalNameDetection {
 		assertEquals("dioxane", identifiedNames.get(2).getTextValue());
 		assertEquals("N,N-dimethylformamide,", identifiedNames.get(3).getTextValue());
 		assertEquals("N-methylpyrrolidone,", identifiedNames.get(4).getTextValue());
-		assertEquals("water", identifiedNames.get(5).getTextValue());		
+		assertEquals("water", identifiedNames.get(5).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(2).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(3).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(4).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(5).getNameType());
 		assertEquals(9, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(10, identifiedNames.get(1).getWordPositionStartIndice());
 		assertEquals(11, identifiedNames.get(2).getWordPositionStartIndice());
@@ -280,6 +371,7 @@ public class TestChemicalNameDetection {
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl] methyl-N-(3-trifluoromethoxybenzyl)]amino-5-(2-methylsulfonylethoxy)pyrimidine", identifiedNames.get(0).getChemicalName());
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl] methyl-N-(3-trifluoromethoxybenzyl)]amino-5-(2-methylsulfonylethoxy)pyrimidine", identifiedNames.get(0).getTextValue());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 	}
 	
 	@Test
@@ -290,6 +382,8 @@ public class TestChemicalNameDetection {
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl]methyl-N-(3-trifluoromethylbenzyl)]amino-5-(2-methylsulfinylethoxy)pyrimidine", identifiedNames.get(1).getChemicalName());
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl]methyl-N-(3-trifluoromethoxybenzyl)]amino-5-(2-methylsulfinylethoxy)pyrimidine", identifiedNames.get(0).getTextValue());
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl]methyl-N-(3-trifluoromethylbenzyl)]amino-5-(2-methylsulfinylethoxy)pyrimidine,", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(5, identifiedNames.get(1).getWordPositionStartIndice());
 	}
@@ -302,6 +396,8 @@ public class TestChemicalNameDetection {
 		assertEquals("3-trifluoromethylbenzyl bromide", identifiedNames.get(1).getChemicalName());
 		assertEquals("2,3-difluorobenzyl bromide", identifiedNames.get(0).getTextValue());
 		assertEquals("3-trifluoromethylbenzyl bromide,", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(6, identifiedNames.get(1).getWordPositionStartIndice());
 	}
@@ -312,6 +408,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("1-[4-(5-bromopyrimidin-2-ylsulfanyl)phenyl]-3-(2-nitrobenzoyl)-urea", identifiedNames.get(0).getChemicalName());
 		assertEquals("1-[4-(5-Bromopyrimidin-2-ylsulfanyl)phenyl]-3-(2-nitrobenzoyl)-urea", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(4, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -321,6 +418,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethyl benzene", identifiedNames.get(0).getChemicalName());//erroneous space will be fixed by OPSIN later
 		assertEquals("ethyl benzene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -330,6 +428,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethane", identifiedNames.get(0).getChemicalName());
 		assertEquals("eth ane", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -339,6 +438,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethane", identifiedNames.get(0).getChemicalName());
 		assertEquals("et hane", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -348,6 +448,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("2-[N-[3-(N-cyclopentylmethyl-N-ethyl)amino-6-methoxypyridin-2-yl]methyl-N-(3-trifluoromethylbenzyl)]amino-5-(2-methylsulfinylethoxy)pyrimidine", identifiedNames.get(0).getChemicalName());
 		assertEquals("2-[N-[ 3-(N-cyclopentylmethyl-N-ethyl)amino-6- methoxypyrid in-2-yl]methyl-N-(3-t rifluoromethylbe nzyl)]amino-5-(2-methylsulfinylethoxy)py rimidine", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -357,6 +458,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("ethylbenzene", identifiedNames.get(0).getChemicalName());
 		assertEquals("ethylbenz ene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(2, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -366,6 +468,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("2-nitrobenzenesulfonamide", identifiedNames.get(0).getChemicalName());
 		assertEquals("2-nitrobenzene sulfonamide", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(3, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -375,6 +478,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene-ethanol", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene -ethanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -384,6 +488,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("1-ethyl-2-methyl-benzene", identifiedNames.get(0).getChemicalName());
 		assertEquals("1-ethyl -2-methyl-benzene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
 	}
@@ -394,6 +499,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("2-ethyl-1-benzene-ethanol", identifiedNames.get(0).getChemicalName());
 		assertEquals("2-ethyl-1-ben ze ne -ethanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(3, identifiedNames.get(0).getWordPositionEndIndice());
 	}
@@ -404,6 +510,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("5-amino-2-[2-(4-methoxyphenyl) vinyl]-4,6-dimorpholinopyrimidine", identifiedNames.get(0).getChemicalName());
 		assertEquals("5-amino-2-[2- (4-methoxyphenyl) vinyl] -4,6-dimorpholinopyrimidine", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(3, identifiedNames.get(0).getWordPositionEndIndice());
 	}
@@ -414,8 +521,21 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("5-amino-2-[2-(4-methoxyphenyl) vinyl]-4-(4-methylpiperazin-1-yl)-6-morpholino pyrimidine", identifiedNames.get(0).getChemicalName());
 		assertEquals("5-amino-2- [2- (4-methoxyphenyl) vinyl] -4- (4-methylpiperazin-1-yl) -6-morpholino pyrimidine", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 		assertEquals(7, identifiedNames.get(0).getWordPositionEndIndice());
+	}
+	
+	@Test
+	public void twoEntitiesDueToEntityType() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("the hydrazone carbonohydrazonoyl dicyanide").extractNames();
+		assertEquals(2, identifiedNames.size());
+		assertEquals("hydrazone", identifiedNames.get(0).getChemicalName());
+		assertEquals("hydrazone", identifiedNames.get(0).getTextValue());
+		assertEquals("carbonohydrazonoyl dicyanide", identifiedNames.get(1).getChemicalName());
+		assertEquals("carbonohydrazonoyl dicyanide", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.family, identifiedNames.get(0).getNameType());
+		assertEquals(NameType.complete, identifiedNames.get(1).getNameType());
 	}
 	
 	@Test
@@ -425,6 +545,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene ethane", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene ethane", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -435,6 +556,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("benzene acetate", identifiedNames.get(0).getChemicalName());
 		assertEquals("benzene acetate", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -445,6 +567,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("acetic anhydride", identifiedNames.get(0).getChemicalName());
 		assertEquals("acetic anhydride", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
@@ -455,6 +578,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("heptane", identifiedNames.get(0).getChemicalName());
 		assertEquals("heptane", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -465,6 +589,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("acetic acid", identifiedNames.get(0).getChemicalName());
 		assertEquals("acetic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 	
@@ -488,6 +613,7 @@ public class TestChemicalNameDetection {
 		assertEquals(1, identifiedNames.size());
 		assertEquals("periodic acid", identifiedNames.get(0).getChemicalName());
 		assertEquals("periodic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
 	}
 
