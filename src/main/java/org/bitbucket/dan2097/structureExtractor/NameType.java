@@ -1,6 +1,6 @@
 package org.bitbucket.dan2097.structureExtractor;
 
-enum NameType{
+public enum NameType{
 	complete,
 	part,
 	family,
