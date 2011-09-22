@@ -7,9 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import nu.xom.Document;
 
@@ -26,16 +24,18 @@ import uk.ac.cam.ch.wwmm.opsin.OpsinResult.OPSIN_RESULT_STATUS;
 
 public class ProcessFolder {
 	public static void main(String[] args) throws Exception {
-		BufferedReader input = new BufferedReader(new FileReader("C:/My Documents/Patents/expected.inchi"));
+		BufferedReader input = new BufferedReader(new FileReader("C:/My Documents/Patents/Extracting names for roger/expected.inchi"));
 		String line = null;
-		List<String> normalisedReferenceInChIs = new ArrayList<String>();
+		List<String> normalisedStereoReferenceInChIs = new ArrayList<String>();
+		List<String> normalisedNoStereoReferenceInChIs = new ArrayList<String>();
 		while ((line = input.readLine()) != null) {
-			normalisedReferenceInChIs.add(InchiPruner.mainChargeAndStereochemistryLayers(line));
+			normalisedStereoReferenceInChIs.add(InchiPruner.mainChargeAndStereochemistryLayers(line));
+			normalisedNoStereoReferenceInChIs.add(InchiPruner.mainAndChargeLayers(line));
 		}
 		input.close();
 		
-		String inputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/";
-		String outputDirectoryLocation = "C:/My Documents/Patents/USPTO-50xml/OPSIN2/";
+		String inputDirectoryLocation = "C:/My Documents/Patents/Extracting names for roger/USPTO-50xml/";
+		String outputDirectoryLocation = "C:/My Documents/Patents/Extracting names for roger/USPTO-50xml/OPSIN2/";
 		
 		File inputDirectory = new File(inputDirectoryLocation);
 		if (!inputDirectory.isDirectory()){
@@ -50,36 +50,47 @@ public class ProcessFolder {
 		NameToStructure n2s = NameToStructure.getInstance();
 		int patentCounter =0;
 		for (int i = 0; i < files.length; i++) {
-			Set<String> normalisedInChIs = new HashSet<String>();
 			File inputFile =files[i];
 			if (!inputFile.isFile()){
 				continue;
 			}
 			File outputFile = new File(outputDirectory, inputFile.getName().substring(0,9)+".name");
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),"UTF-8"));
-			//File outputFile2 = new File(outputDirectory, inputFile.getName().substring(0,9)+".in");
-			//BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile2),"UTF-8"));
+			List<IdentifiedChemicalName> identifiedNames = new ArrayList<IdentifiedChemicalName>();
 			Document doc = XMLFileToXMLDocument.readXMLFileUsingHtmlTagSoup(inputFile);
 			List<String> chunks = xmlDocumentToString.convertDocumentToNewLineDelimitedList(doc);
 			for (String chunk : chunks) {
-				List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(chunk).extractNames();
-				//writer2.append(chunk +"\n");
-				for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
-					OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getChemicalName());
-					if (or.getStatus() != OPSIN_RESULT_STATUS.FAILURE){
-						writer.write(identifiedChemicalName.getChemicalName() +"\n");
-						String inchi =NameToInchi.convertResultToInChI(or);
-						if (inchi!=null){
-							normalisedInChIs.add(InchiPruner.mainChargeAndStereochemistryLayers(inchi));
+				identifiedNames.addAll(new DocumentToStructures(chunk).extractNames());
+			}
+			IdentifiedChemicalName matchForDrug  = null;
+			IdentifiedChemicalName matchForDrugNoStereo  = null;
+			for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
+				OpsinResult or = n2s.parseChemicalName(identifiedChemicalName.getChemicalName());
+				if (or.getStatus() != OPSIN_RESULT_STATUS.FAILURE){
+					writer.write(identifiedChemicalName.getChemicalName() +"\n");
+					String inchi =NameToInchi.convertResultToInChI(or);
+					if (inchi!=null && matchForDrug==null){
+						String normalisedStereoInChI = InchiPruner.mainChargeAndStereochemistryLayers(inchi);
+						if (normalisedStereoInChI.equals(normalisedStereoReferenceInChIs.get(patentCounter))){
+							matchForDrug = identifiedChemicalName;
+						}
+						else if (matchForDrugNoStereo==null &&
+								InchiPruner.mainAndChargeLayers(inchi).equals(normalisedNoStereoReferenceInChIs.get(patentCounter))){
+							matchForDrugNoStereo = identifiedChemicalName;
 						}
 					}
 				}
 			}
-			if (normalisedInChIs.contains(normalisedReferenceInChIs.get(patentCounter++))){
-				System.out.println(patentCounter);
+			System.out.print(inputFile.getName().substring(0, 9));
+			if (matchForDrug !=null){
+				System.out.print(" stereomatched:\t" +  matchForDrug.getTextValue() + "\t" + matchForDrug.getChemicalName());
 			}
+			else if (matchForDrugNoStereo !=null){
+				System.out.print(" stereodidnotmatch:\t" +  matchForDrugNoStereo.getTextValue() + "\t" + matchForDrugNoStereo.getChemicalName());
+			}
+			System.out.println("");
+			patentCounter++;
 			writer.close();
-			//writer2.close();
 		}
 	}
 }
