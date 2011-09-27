@@ -698,4 +698,10 @@ public class TestChemicalNameDetection {
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("val in").extractNames();
 		assertEquals(0, identifiedNames.size());
 	}
+	
+	@Test
+	public void nonChemicalButOpsinParsable9() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("a brine").extractNames();
+		assertEquals(0, identifiedNames.size());
+	}
 }

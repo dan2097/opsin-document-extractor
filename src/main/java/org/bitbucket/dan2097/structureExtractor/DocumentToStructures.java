@@ -20,7 +20,7 @@ public class DocumentToStructures {
 	private static final char END_OF_SUBSTITUENT = '\u00e9';
 	private static ParseRules pr;
 	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
-	private static final List<String> stopWords = Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in");
+	private static final List<String> stopWords = Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine");
 	
 	private final String[] words;
 	private final int wordsLength;
