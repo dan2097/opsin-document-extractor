@@ -3,6 +3,7 @@ package org.bitbucket.dan2097.structureExtractor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import uk.ac.cam.ch.wwmm.opsin.NameToStructure;
@@ -15,6 +16,7 @@ import uk.ac.cam.ch.wwmm.opsin.StringTools;
 public class DocumentToStructures {
 	
 	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
+	private static final Pattern tokenPattern = Pattern.compile("[\\S]+");
 	private static final char END_OF_MAINGROUP = '\u00e2';
 	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
 	private static final char END_OF_SUBSTITUENT = '\u00e9';
@@ -25,6 +27,7 @@ public class DocumentToStructures {
 	private final String[] words;
 	private final int wordsLength;
 	private final String[] normalisedWords;
+	private final List<Integer> wordStartIndices = new ArrayList<Integer>();
 	
 	private NameType currentNameType = null;
 
@@ -37,20 +40,42 @@ public class DocumentToStructures {
 	}
 	
 	/**
-	 * Convenience constructor: splits on whitespace to generate words array
-	 * @param sentence
+	 * A string which should be searched for chemicals.
+	 * This could be a single word or even a whole document
+	 * @param stringToFindChemicalsIn
 	 */
-	public DocumentToStructures(String sentence) {
-		this(matchWhiteSpace.split(sentence));
+	public DocumentToStructures(String stringToFindChemicalsIn) {
+		Matcher m = tokenPattern.matcher(stringToFindChemicalsIn);
+		List<String> words = new ArrayList<String>();
+		while (m.find()) {
+			wordStartIndices.add(m.start());
+			words.add(m.group());
+		}
+		this.words = words.toArray(new String[words.size()]);
+		wordsLength = this.words.length;
+		normalisedWords = generateNormalisedWords();
 	}
 
 	/**
-	 * A list of words to find chemicals within
-	 * THESE WORDS MUST NOT CONTAIN WHITESPACE
+	 * A list of tokens not containing whitespace and not of zero length
+	 * The start/end token indices are calculated on the assumption of one space between each token
+	 * The word position indices are hence more likely to be applicable
 	 * @param words
 	 */
-	public DocumentToStructures(String[] words) {
-		this.words = words;
+	public DocumentToStructures(List<String> tokens) {
+		int indice =-1;//assume no starting space
+		for (String token : tokens) {
+			indice++;
+			if (token.length()==0){
+				throw new IllegalArgumentException("Token list contained a zero length token");
+			}
+			if (matchWhiteSpace.matcher(token).find()){
+				throw new IllegalArgumentException("Token contained white space:" +token);
+			}
+			wordStartIndices.add(indice);
+			indice += token.length();
+		}
+		words = tokens.toArray(new String[tokens.size()]);
 		wordsLength = words.length;
 		normalisedWords = generateNormalisedWords();
 	}
@@ -98,9 +123,9 @@ public class DocumentToStructures {
 			if (prr.getParseTokensList().size()==0){//input could not be used to form a chemical name
 				if (!chemicalNameBuffer.toString().equals("")){//a chemical name is already in the buffer, add it to the identifiedChemicalNames
 					String name =chemicalNameBuffer.toString();
-					int startingIndice = i-(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
-					int finalIndice = i -1;
-					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
+					int startWordIndice = i-(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
+					int endWordIndice = i -1;
+					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, 0));
 					chemicalNameBuffer = new StringBuilder();
 					currentNameType = null;
 				}
@@ -158,25 +183,29 @@ public class DocumentToStructures {
 					chemicalNameBuffer.append(" ");
 				}
 				String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
-				boolean endsInUninterpretableS = isAnUninterpretableS(uninterpretedWordSection);
-				adjustCurrentNameType(prr, endsInUninterpretableS);
 				chemicalNameBuffer.append(parsedOpsinNormalisedText);
 				if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 					i++;
 				}
 				i += spacesRemoved;
+
+				if (isAnUninterpretableS(uninterpretedWordSection)){//terminal uninterpretable 's' implies a family of compounds
+					uninterpretedWordSection = uninterpretedWordSection.substring(1);
+					currentNameType = NameType.family;
+					chemicalNameBuffer.append('s');
+				}
+				else{
+					adjustCurrentNameType(prr);
+				}
 				if (currentNameType == NameType.family || 
 						i +1==wordsLength ||
-						endsInUninterpretableS ||
 						(uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) ) ||
+						fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection) ||
 						fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
 					String name =chemicalNameBuffer.toString();
-					if (endsInUninterpretableS){
-						name+='s';
-					}
-					int startingIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
-					int finalIndice = i;
-					identifiedChemicalNames.add(createIdentifiedName(name, startingIndice, finalIndice));
+					int startWordIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
+					int endWordIndice = i;
+					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, uninterpretedWordSection.length()));
 					chemicalNameBuffer = new StringBuilder();
 					currentNameType = null;
 					totalSpacesRemoved =0;
@@ -208,13 +237,9 @@ public class DocumentToStructures {
 	/**
 	 * Checks what word type/s are included in the current prr and adjusts the currentNameType accordingly
 	 * @param prr
-	 * @param endsInUninterpretableS 
 	 */
-	private void adjustCurrentNameType(ParseRulesResults prr, boolean endsInUninterpretableS) {
-		if (endsInUninterpretableS){
-			currentNameType = NameType.family;
-		}
-		else if (prr.getParseTokensList().size()>0){
+	private void adjustCurrentNameType(ParseRulesResults prr) {
+		if (prr.getParseTokensList().size()>0){
 			List<Character> annotations = prr.getParseTokensList().get(0).getAnnotations();
 			String firsToken = (prr.getParseTokensList().get(0).getTokens().size() > 0) ? prr.getParseTokensList().get(0).getTokens().get(0) :"";
 			for (Character annotation : annotations) {
@@ -467,47 +492,62 @@ public class DocumentToStructures {
 	/**
 	 * Removes non chemical brackets, updating the starting and final indices appropriately before returning a new IdentifiedChemicalName
 	 * @param name
-	 * @param startingIndice
-	 * @param finalIndice
+	 * @param startWordIndice
+	 * @param endWordIndice
+	 * @param lengthOfEndOfLastWordThatIsUnused 
 	 * @return
 	 */
-	private IdentifiedChemicalName createIdentifiedName(String name, int startingIndice, int finalIndice) {
-		boolean frontBracketRemoved =false;
-		boolean endBracketRemoved =true;
+	private IdentifiedChemicalName createIdentifiedName(String name, int startWordIndice, int endWordIndice, int lengthOfEndOfLastWordThatIsUnused) {
+		String rawChemicalName = extractRawText(startWordIndice, endWordIndice);
+		rawChemicalName =rawChemicalName.substring(0, rawChemicalName.length()-lengthOfEndOfLastWordThatIsUnused);
+		int startingIndice = wordStartIndices.get(startWordIndice);
+		boolean frontBracketRemoved = false;
+		boolean endBracketRemoved = false;
 		Character firstLetter= name.charAt(0);
 		Character lastLetter= name.charAt(name.length()-1);
 		int openBrackets = numberOfOpenbrackets(name);
 		if (openBrackets==1){
 			if (isOpenBracket(firstLetter)){
 				name = name.substring(1);
-				frontBracketRemoved =true;
+				frontBracketRemoved = true;
 			}
 		}
 		else if (openBrackets==-1){
 			if (isCloseBracket(lastLetter)){
 				name = name.substring(0, name.length()-1);
-				endBracketRemoved =true;
+				endBracketRemoved = true;
 			}
 		}
 		else if (openBrackets==0){;
 			if (isOpenBracket(firstLetter) && isCloseBracket(lastLetter)){
 				name = name.substring(1, name.length()-1);
-				frontBracketRemoved =true;
-				endBracketRemoved =true;
+				frontBracketRemoved = true;
+				endBracketRemoved = true;
 			}
 		}
-		if (frontBracketRemoved && words[startingIndice].length()==1 && isOpenBracket(words[startingIndice].charAt(0))){
+		if (frontBracketRemoved){
+			rawChemicalName = rawChemicalName.substring(1);
 			startingIndice++;
+			if (words[startWordIndice].length()==1 && isOpenBracket(words[startWordIndice].charAt(0))){
+				startWordIndice++;
+				rawChemicalName = rawChemicalName.substring(1);//the inter word space needs to be removed
+				startingIndice++;
+			}
 		}
-		if (endBracketRemoved && words[finalIndice].length()==1 && isCloseBracket(words[finalIndice].charAt(0))){
-			finalIndice--;
+		if (endBracketRemoved){
+			rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);
+			if (words[endWordIndice].length()==1 && isCloseBracket(words[endWordIndice].charAt(0))){
+				endWordIndice--;
+				rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);//the inter word space needs to be removed
+			}
 		}
-		return new IdentifiedChemicalName(startingIndice, finalIndice, name, extractRawText(startingIndice, finalIndice), currentNameType);
+		int endingIndice = startingIndice + rawChemicalName.length();
+		return new IdentifiedChemicalName(startWordIndice, endWordIndice, startingIndice, endingIndice, name, rawChemicalName, currentNameType);
 	}
 
-	private String extractRawText(int startingIndice, int finalIndice) {
+	private String extractRawText(int startWordIndice, int endWordIndice) {
 		StringBuilder rawTextBuilder =new StringBuilder();
-		for (int i = startingIndice; i <= finalIndice; i++) {
+		for (int i = startWordIndice; i <= endWordIndice; i++) {
 			rawTextBuilder.append(' ');
 			rawTextBuilder.append(words[i]);
 		}
