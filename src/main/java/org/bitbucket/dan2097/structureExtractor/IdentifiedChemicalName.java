@@ -4,22 +4,31 @@ public class IdentifiedChemicalName {
 
 	private final int start;
 	private final int end;
+	private final int startWordIndice;
+	private final int endWordIndice;
 	private final String chemicalName;
 	private final String textValue;
 	private final NameType nameType;
+
 	/**
-	 * Construct from the starting word indice, the final word indice, the chemicalName as reported by OPSIN and the original text value
+	 * Construct from the starting word indice, the ending word indice
+	 * the absolute start indice, the absolute end indice
+	 * the chemicalName as reported by OPSIN and the original text value
+	 * @param startWordIndice
+	 * @param endWordIndice
 	 * @param start
 	 * @param end
 	 * @param chemicalName
 	 * @param textValue
 	 * @param nameType
 	 */
-	public IdentifiedChemicalName(int start, int end,  String chemicalName, String textValue, NameType nameType) {
-		this.start =start;
-		this.end =end;
-		this.chemicalName =chemicalName;
-		this.textValue =textValue;
+	public IdentifiedChemicalName(int startWordIndice, int endWordIndice, int start, int end, String chemicalName, String textValue, NameType nameType) {
+		this.startWordIndice = startWordIndice;
+		this.endWordIndice = endWordIndice;
+		this.start = start;
+		this.end = end;
+		this.chemicalName = chemicalName;
+		this.textValue = textValue;
 		this.nameType = nameType;
 	}
 
@@ -33,7 +42,7 @@ public class IdentifiedChemicalName {
 	}
 	
 	/**
-	 * Gets the text from which the chemical name was found. Usually you actually want getChemicalName as this will not include trailing punctuation
+	 * Gets the text from which the chemical name was found
 	 * @return
 	 */
 	public String getTextValue() {
@@ -42,19 +51,35 @@ public class IdentifiedChemicalName {
 
 	/**
 	 * Returns the indice of the starting word.
-	 * Remember the input to the program is whiteSpace separated words
+	 * NOTE: Words are determined using whiteSpace as a delimiter
 	 * @return
 	 */
 	public int getWordPositionStartIndice() {
-		return start;
+		return startWordIndice;
 	}
 	
 	/**
 	 * Returns the indice of the final word.
-	 * Remember the input to the program is whiteSpace separated words
+	 * NOTE: Words are determined using whiteSpace as a delimiter
 	 * @return
 	 */
 	public int getWordPositionEndIndice() {
+		return endWordIndice;
+	}
+	
+	/**
+	 * Returns the start of the chemical name as a character offset from the start of the input string
+	 * @return
+	 */
+	public int getStart() {
+		return start;
+	}
+
+	/**
+	 * Returns the end of the chemical name as a character offset from the start of the input string
+	 * @return
+	 */
+	public int getEnd() {
 		return end;
 	}
 
