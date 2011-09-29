@@ -491,36 +491,36 @@ public class DocumentToStructures {
 	
 	/**
 	 * Removes non chemical brackets, updating the starting and final indices appropriately before returning a new IdentifiedChemicalName
-	 * @param name
+	 * @param opsinChemicalName
 	 * @param startWordIndice
 	 * @param endWordIndice
 	 * @param lengthOfEndOfLastWordThatIsUnused 
 	 * @return
 	 */
-	private IdentifiedChemicalName createIdentifiedName(String name, int startWordIndice, int endWordIndice, int lengthOfEndOfLastWordThatIsUnused) {
+	private IdentifiedChemicalName createIdentifiedName(String opsinChemicalName, int startWordIndice, int endWordIndice, int lengthOfEndOfLastWordThatIsUnused) {
 		String rawChemicalName = extractRawText(startWordIndice, endWordIndice);
 		rawChemicalName =rawChemicalName.substring(0, rawChemicalName.length()-lengthOfEndOfLastWordThatIsUnused);
 		int startingIndice = wordStartIndices.get(startWordIndice);
 		boolean frontBracketRemoved = false;
 		boolean endBracketRemoved = false;
-		Character firstLetter= name.charAt(0);
-		Character lastLetter= name.charAt(name.length()-1);
-		int openBrackets = numberOfOpenbrackets(name);
+		Character firstLetter= opsinChemicalName.charAt(0);
+		Character lastLetter= opsinChemicalName.charAt(opsinChemicalName.length()-1);
+		int openBrackets = numberOfOpenbrackets(opsinChemicalName);
 		if (openBrackets==1){
 			if (isOpenBracket(firstLetter)){
-				name = name.substring(1);
+				opsinChemicalName = opsinChemicalName.substring(1);
 				frontBracketRemoved = true;
 			}
 		}
 		else if (openBrackets==-1){
 			if (isCloseBracket(lastLetter)){
-				name = name.substring(0, name.length()-1);
+				opsinChemicalName = opsinChemicalName.substring(0, opsinChemicalName.length()-1);
 				endBracketRemoved = true;
 			}
 		}
 		else if (openBrackets==0){;
 			if (isOpenBracket(firstLetter) && isCloseBracket(lastLetter)){
-				name = name.substring(1, name.length()-1);
+				opsinChemicalName = opsinChemicalName.substring(1, opsinChemicalName.length()-1);
 				frontBracketRemoved = true;
 				endBracketRemoved = true;
 			}
@@ -541,8 +541,12 @@ public class DocumentToStructures {
 				rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);//the inter word space needs to be removed
 			}
 		}
+		if (opsinChemicalName.endsWith("-") || opsinChemicalName.endsWith(",")){
+			opsinChemicalName = opsinChemicalName.substring(0, opsinChemicalName.length()-1);
+			rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);
+		}
 		int endingIndice = startingIndice + rawChemicalName.length();
-		return new IdentifiedChemicalName(startWordIndice, endWordIndice, startingIndice, endingIndice, name, rawChemicalName, currentNameType);
+		return new IdentifiedChemicalName(startWordIndice, endWordIndice, startingIndice, endingIndice, opsinChemicalName, rawChemicalName, currentNameType);
 	}
 
 	private String extractRawText(int startWordIndice, int endWordIndice) {
