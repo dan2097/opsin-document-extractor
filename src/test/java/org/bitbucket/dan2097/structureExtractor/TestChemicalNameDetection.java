@@ -188,6 +188,32 @@ public class TestChemicalNameDetection {
 		assertEquals(0, identifiedNames.get(0).getStart());
 		assertEquals(14, identifiedNames.get(0).getEnd());
 	}
+	
+	@Test
+	public void testPart3() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("pentyl,").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("pentyl", identifiedNames.get(0).getChemicalName());
+		assertEquals("pentyl", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(6, identifiedNames.get(0).getEnd());
+	}
+	
+	@Test
+	public void testPart4() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("methyl-").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methyl", identifiedNames.get(0).getChemicalName());
+		assertEquals("methyl", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(6, identifiedNames.get(0).getEnd());
+	}
 
 	@Test
 	public void testPolymer1() throws Exception{
