@@ -457,6 +457,84 @@ public class TestChemicalNameDetection {
 	}
 
 	@Test
+	public void testNonchemicalBrackets5() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("methanol))").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(8, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
+	public void testNonchemicalBrackets6() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("((methanol").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(2, identifiedNames.get(0).getStart());
+		assertEquals(10, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
+	public void testNonchemicalBrackets7() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("methanol) )").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(8, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
+	public void testNonchemicalBrackets8() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("( (methanol").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(3, identifiedNames.get(0).getStart());
+		assertEquals(11, identifiedNames.get(0).getEnd());
+	}
+	
+	@Test
+	public void testNonchemicalBrackets9() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("methanol ))").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(8, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
+	public void testNonchemicalBrackets10() throws Exception{
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("(( methanol").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("methanol", identifiedNames.get(0).getChemicalName());
+		assertEquals("methanol", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(1, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(3, identifiedNames.get(0).getStart());
+		assertEquals(11, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
 	public void testAdjacentNonNameInformation1() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("benzene( 50 ml)").extractNames();
 		assertEquals(1, identifiedNames.size());
