@@ -501,45 +501,66 @@ public class DocumentToStructures {
 		String rawChemicalName = extractRawText(startWordIndice, endWordIndice);
 		rawChemicalName =rawChemicalName.substring(0, rawChemicalName.length()-lengthOfEndOfLastWordThatIsUnused);
 		int startingIndice = wordStartIndices.get(startWordIndice);
-		boolean frontBracketRemoved = false;
-		boolean endBracketRemoved = false;
-		Character firstLetter= opsinChemicalName.charAt(0);
-		Character lastLetter= opsinChemicalName.charAt(opsinChemicalName.length()-1);
+		int frontBracketsRemoved = 0;
+		int endBracketsRemoved = 0;
 		int openBrackets = numberOfOpenbrackets(opsinChemicalName);
-		if (openBrackets==1){
-			if (isOpenBracket(firstLetter)){
+		if (openBrackets >= 1){
+			while (openBrackets >= 1 && isOpenBracket(opsinChemicalName.charAt(0))){
 				opsinChemicalName = opsinChemicalName.substring(1);
-				frontBracketRemoved = true;
+				frontBracketsRemoved++;
+				openBrackets--;
 			}
 		}
-		else if (openBrackets==-1){
-			if (isCloseBracket(lastLetter)){
+		else if (openBrackets <= -1){
+			while (openBrackets <= -1 && isCloseBracket(opsinChemicalName.charAt(opsinChemicalName.length()-1))){
 				opsinChemicalName = opsinChemicalName.substring(0, opsinChemicalName.length()-1);
-				endBracketRemoved = true;
+				endBracketsRemoved++;
+				openBrackets++;
 			}
 		}
-		else if (openBrackets==0){;
-			if (isOpenBracket(firstLetter) && isCloseBracket(lastLetter)){
+		else if (openBrackets==0){
+			while (isOpenBracket(opsinChemicalName.charAt(0)) && isCloseBracket(opsinChemicalName.charAt(opsinChemicalName.length()-1))){
 				opsinChemicalName = opsinChemicalName.substring(1, opsinChemicalName.length()-1);
-				frontBracketRemoved = true;
-				endBracketRemoved = true;
+				frontBracketsRemoved++;
+				endBracketsRemoved++;
 			}
 		}
-		if (frontBracketRemoved){
-			rawChemicalName = rawChemicalName.substring(1);
-			startingIndice++;
-			if (words[startWordIndice].length()==1 && isOpenBracket(words[startWordIndice].charAt(0))){
-				startWordIndice++;
-				rawChemicalName = rawChemicalName.substring(1);//the inter word space needs to be removed
-				startingIndice++;
+		if (frontBracketsRemoved > 0){
+			int interWordSpacesToRemove = 0;//e.g. "( methanol" --> "methanol" involves removing one space
+			int bracketsEncountered = 0;
+			mainLoop: for (int i = startWordIndice; i < words.length; i++) {
+				String rawWord = words[i];
+				for (int j = 0; j < rawWord.length(); j++) {
+					if (bracketsEncountered == frontBracketsRemoved && !Character.isWhitespace(rawWord.charAt(j))){
+						interWordSpacesToRemove = i - startWordIndice;
+						break mainLoop;
+					}
+					if (isOpenBracket(rawWord.charAt(j))){
+						bracketsEncountered++;
+					}
+				}
 			}
+			rawChemicalName = rawChemicalName.substring(frontBracketsRemoved + interWordSpacesToRemove);
+			startingIndice += (frontBracketsRemoved + interWordSpacesToRemove);
+			startWordIndice += interWordSpacesToRemove;
 		}
-		if (endBracketRemoved){
-			rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);
-			if (words[endWordIndice].length()==1 && isCloseBracket(words[endWordIndice].charAt(0))){
-				endWordIndice--;
-				rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length()-1);//the inter word space needs to be removed
+		if (endBracketsRemoved > 0){
+			int interWordSpacesToRemove = 0;//e.g. "methanol )" --> "methanol" involves removing one space
+			int bracketsEncountered = 0;
+			mainLoop: for (int i = endWordIndice; i >= 0; i--) {
+				String rawWord = words[i];
+				for (int j = rawWord.length() -1; j >= 0; j--) {
+					if (bracketsEncountered == endBracketsRemoved && !Character.isWhitespace(rawWord.charAt(j))){
+						interWordSpacesToRemove = endWordIndice -i;
+						break mainLoop;
+					}
+					if (isCloseBracket(rawWord.charAt(j))){
+						bracketsEncountered++;
+					}
+				}
 			}
+			rawChemicalName = rawChemicalName.substring(0, rawChemicalName.length() - (endBracketsRemoved + interWordSpacesToRemove));
+			endWordIndice -= interWordSpacesToRemove;
 		}
 		if (opsinChemicalName.endsWith("-") || opsinChemicalName.endsWith(",")){
 			opsinChemicalName = opsinChemicalName.substring(0, opsinChemicalName.length()-1);
@@ -559,10 +580,12 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="pyridines";
+		String input ="methanol ))";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
+			System.out.println(identifiedChemicalName.getTextValue());
+			System.out.println(identifiedChemicalName.getNameType());
 		}
 	}
 }
