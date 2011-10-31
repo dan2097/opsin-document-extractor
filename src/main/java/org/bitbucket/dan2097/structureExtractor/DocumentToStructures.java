@@ -2,7 +2,9 @@ package org.bitbucket.dan2097.structureExtractor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +24,7 @@ public class DocumentToStructures {
 	private static final char END_OF_SUBSTITUENT = '\u00e9';
 	private static ParseRules pr;
 	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
-	private static final List<String> stopWords = Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine");
+	private static final Set<String> stopWords = new HashSet<String>(Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine", "n2", "o2", "f2", "cl2", "br2", "i2", "m"));
 	
 	private final String[] words;
 	private final int wordsLength;
@@ -580,7 +582,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="methanol ))";
+		String input ="palladium (II)";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
