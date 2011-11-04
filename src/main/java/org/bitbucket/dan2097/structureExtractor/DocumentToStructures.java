@@ -24,7 +24,7 @@ public class DocumentToStructures {
 	private static final char END_OF_SUBSTITUENT = '\u00e9';
 	private static ParseRules pr;
 	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
-	private static final Set<String> stopWords = new HashSet<String>(Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine", "n2", "o2", "f2", "cl2", "br2", "i2", "m"));
+	private static final Set<String> stopWords = new HashSet<String>(Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine", "n2", "n2,", "o2", "o2,", "f2", "f2,", "cl2", "cl2,", "br2", "br2,", "i2", "i2,"));
 	
 	private final String[] words;
 	private final int wordsLength;
@@ -109,7 +109,7 @@ public class DocumentToStructures {
 		StringBuilder chemicalNameBuffer = new StringBuilder();//holds the current chemical name under consideration
 		int totalSpacesRemoved =0;//running total of spaces removed for the current name
 		for (int i = 0; i < wordsLength; i++) {
-			if (chemicalNameBuffer.length()==0 && isMadeOfDigits(normalisedWords[i])){//stray digits cannot be assumed to be part of a chemical name
+			if (chemicalNameBuffer.length()==0 && tooAmbiguousToClassifyAsChemical(normalisedWords[i])){//stray digits and the like cannot be assumed to be part of a chemical name
 				continue;
 			}
 			String stringToTest= (i+1) < wordsLength ? normalisedWords[i] + " "+ normalisedWords[i+1] : normalisedWords[i];//attempt to parse the word plus the next word
@@ -297,11 +297,25 @@ public class DocumentToStructures {
 		return uninterpretedWordSection.length() ==0 || (uninterpretedWordSection.length() ==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)));
 	}
 
+	
+	private boolean tooAmbiguousToClassifyAsChemical(String word) {
+		if (isMadeOfDigits(word)){
+			return true;
+		}
+		if (word.endsWith("M") && (word.length()==1 || isMadeOfDigits(word.substring(0, word.length()-1)))){
+			return true;
+		}
+		return false;
+	}
+
 	private static boolean isMadeOfDigits(String word) {
 		for (char charac : word.toCharArray()) {
 			if(!Character.isDigit(charac)){
 				return false;
 			}
+		}
+		if (word.length()==0){
+			return false;
 		}
 		return true;
 	}
@@ -582,7 +596,7 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="palladium (II)";
+		String input ="1M n-hexane";
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
