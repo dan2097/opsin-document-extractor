@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import uk.ac.cam.ch.wwmm.opsin.NameToStructure;
 import uk.ac.cam.ch.wwmm.opsin.NameToStructureException;
+import uk.ac.cam.ch.wwmm.opsin.OpsinPreProcessorWrapper;
 import uk.ac.cam.ch.wwmm.opsin.ParseRules;
 import uk.ac.cam.ch.wwmm.opsin.ParseRulesResults;
 import uk.ac.cam.ch.wwmm.opsin.ParseTokens;
@@ -321,13 +322,13 @@ public class DocumentToStructures {
 	}
 
 	/**
-	 * Runs the preprocessor over the list of words and markups up stop words with exclamation marks to prevent their recognition
+	 * Runs the OPSIN preprocessor over the list of words and marks up problematic words with exclamation marks to prevent their recognition
 	 * @return
 	 */
 	private String[] generateNormalisedWords() {
 		String[] normalisedWords = new String[wordsLength];
 		for (int i = 0; i < wordsLength; i++) {
-			String word = PreProcesssor.preProcess(words[i]);
+			String word = OpsinPreProcessorWrapper.normalise(words[i]);
 			if (stopWords.contains(word.toLowerCase()) && !periodicSpecialCase(word, i)){
 				word = '!' + word + '!';
 			}
