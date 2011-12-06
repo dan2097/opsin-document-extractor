@@ -330,7 +330,7 @@ public class DocumentToStructures {
 		for (int i = 0; i < wordsLength; i++) {
 			String word = OpsinPreProcessorWrapper.normalise(words[i]);
 			if (stopWords.contains(word.toLowerCase()) && !periodicSpecialCase(word, i)){
-				word = '!' + word + '!';
+				word = '_' + word + '_';
 			}
 			normalisedWords[i] = word;
 		}
@@ -597,8 +597,8 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="1M n-hexane";
-		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();;
+		String input ="Pyridine and benzene are chemicals";
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();
 		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
 			System.out.println(identifiedChemicalName.getChemicalName());
 			System.out.println(identifiedChemicalName.getTextValue());

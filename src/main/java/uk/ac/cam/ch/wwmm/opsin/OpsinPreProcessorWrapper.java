@@ -9,6 +9,7 @@ public class OpsinPreProcessorWrapper {
 
 	/**
 	 * Employs the OPSIN preprocessor to normalise the given word.
+	 * In the case that OPSIN does not recognise a unicode character non-ASCII characters are replaced by underscores
 	 * @param word
 	 * @return
 	 */
@@ -16,7 +17,15 @@ public class OpsinPreProcessorWrapper {
 		try {
 			return PreProcessor.preProcess(word);
 		} catch (PreProcessingException e) {
-			return word;//word has unrecognised unicode character
+			StringBuilder sb = new StringBuilder(word);
+			for(int i=0;i<sb.length();i++) {
+				char c = sb.charAt(i);
+				if(c >= 128) {
+					sb.replace(i, i+1, "_");//replace non ascii characters with underscore
+				}
+			}
+			//word has unrecognised unicode character
+			return sb.toString();
 		}
 	}
 }
