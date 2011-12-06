@@ -1,25 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>uk.ac.cam.ch.wwmm</groupId>
+    <artifactId>wwmm-parent</artifactId>
+    <version>4</version>
+  </parent>
 	<groupId>uk.ac.cam.ch.opsin</groupId>
 	<artifactId>opsin-document-extractor</artifactId>
+  <packaging>jar</packaging>
 	<name>OPSIN Document Extractor</name>
 	<version>0.3-SNAPSHOT</version>
 	<description>Utilises OPSIN to perform brute force discovery of chemical names that are parsable by OPSIN</description>
+  <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 	<licenses>
 		<license>
 			<name>Artistic License 2.0</name>
 			<url> http://www.opensource.org/licenses/artistic-license-2.0.php</url>
 		</license>
 	</licenses>
-  <packaging>jar</packaging>
   <scm>
 		<connection>
-			scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
+			scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
 		</connection>
 		<developerConnection>
-			scm:hg:https://dan2097@bitbucket.org/dan2097/opsin-document-extractor/
+			scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
 		</developerConnection>
-		<url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 	</scm>
 	<developers>
 		<developer>
@@ -33,36 +38,11 @@
 			</roles>
 		</developer>
 	</developers>
-	<repositories>
-	  <repository>
-	    <id>ucc</id>
-	    <url>https://maven.ch.cam.ac.uk/m2repo</url>
-	  </repository>
-	</repositories>
-	<build>
-	  <plugins>
-	    <plugin>
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-compiler-plugin</artifactId>
-	      <configuration>
-	        <source>1.5</source>
-	        <target>1.5</target>
-	      </configuration>
-	    </plugin>
-	    <plugin>
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-surefire-plugin</artifactId>
-	      <configuration>
-	        <testFailureIgnore>false</testFailureIgnore>
-	      </configuration>
-	    </plugin>
-	  </plugins>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.ccil.cowan.tagsoup</groupId>
 			<artifactId>tagsoup</artifactId>
-			<version>1.2</version>
+			<version>1.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -84,11 +64,6 @@
 			<artifactId>opsin-inchi</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-		<dependency>
-			<groupId>xom</groupId>
-			<artifactId>xom</artifactId>
-			<version>1.2.3</version>
-			</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
