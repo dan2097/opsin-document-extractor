@@ -1033,4 +1033,23 @@ public class TestChemicalNameDetection {
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("a brine").extractNames();
 		assertEquals(0, identifiedNames.size());
 	}
+	
+	@Test
+	public void nonASCIIcharacters() throws Exception{
+		DocumentToStructures docToStruct = new DocumentToStructures("\u062A methane \u062Aethane propane\u062A");
+		List<IdentifiedChemicalName> identifiedNames = docToStruct.extractNames();
+		assertEquals(2, identifiedNames.size());
+		assertEquals("methane", identifiedNames.get(0).getChemicalName());
+		assertEquals("methane", identifiedNames.get(0).getTextValue());
+		
+		assertEquals("propane", identifiedNames.get(1).getChemicalName());
+		assertEquals("propane", identifiedNames.get(1).getTextValue());
+		
+		String[] normalisedWords = docToStruct.getNormalisedWords();
+		assertEquals(4, normalisedWords.length);
+		assertEquals("_", normalisedWords[0]);
+		assertEquals("methane", normalisedWords[1]);
+		assertEquals("_ethane", normalisedWords[2]);
+		assertEquals("propane_", normalisedWords[3]);
+	}
 }
