@@ -389,7 +389,11 @@ public class DocumentToStructures {
 			}
 			indiceTojoin++;
 		}
-		String parsedOpsinNormalisedText =StringTools.stringListToString(getParses(stringToTest).getParseTokensList().get(0).getTokens(), "");
+		ParseRulesResults prr = getParses(stringToTest);
+		if (prr.getParseTokensList().size()==0){
+			return new SpaceRemovalResult(false, null, null, null);
+		}
+		String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
 		String newParsedOpsinNormalisedText = parsedOpsinNormalisedText;
 		do {//join with subsequent words until either the chemical name is fully interpretable or the join does not increase the amount of interpretable name
 			if (indiceTojoin >=wordsLength){
@@ -397,7 +401,10 @@ public class DocumentToStructures {
 			}
 			parsedOpsinNormalisedText = newParsedOpsinNormalisedText;
 			stringToTest+=normalisedWords[indiceTojoin];
-			ParseRulesResults prr = getParses(stringToTest);
+			prr = getParses(stringToTest);
+			if (prr.getParseTokensList().size()==0){
+				return new SpaceRemovalResult(false, null, null, null);
+			}
 			newParsedOpsinNormalisedText = StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
 			String uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
 			spacesRemoved++;
