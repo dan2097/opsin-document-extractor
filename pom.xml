@@ -7,18 +7,19 @@
   </parent>
 	<groupId>uk.ac.cam.ch.opsin</groupId>
 	<artifactId>opsin-document-extractor</artifactId>
+	<version>0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 	<name>OPSIN Document Extractor</name>
-	<version>0.3-SNAPSHOT</version>
 	<description>Utilises OPSIN to perform brute force discovery of chemical names that are parsable by OPSIN</description>
   <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 	<licenses>
 		<license>
 			<name>Artistic License 2.0</name>
-			<url> http://www.opensource.org/licenses/artistic-license-2.0.php</url>
+			<url>http://www.opensource.org/licenses/artistic-license-2.0.php</url>
 		</license>
 	</licenses>
   <scm>
+    <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 		<connection>
 			scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
 		</connection>
@@ -38,6 +39,12 @@
 			</roles>
 		</developer>
 	</developers>
+  <distributionManagement>
+    <repository>
+      <id>ucc</id>
+      <url>https://maven.ch.cam.ac.uk/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.ccil.cowan.tagsoup</groupId>
