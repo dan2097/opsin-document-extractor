@@ -970,6 +970,28 @@ public class TestChemicalNameDetection {
 		assertEquals(0, identifiedNames.get(0).getStart());
 		assertEquals(11, identifiedNames.get(0).getEnd());
 	}
+	
+	@Test
+	public void intendedSpace6() throws Exception{
+		//counter example
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("ethyl, propyl").extractNames();
+		assertEquals(2, identifiedNames.size());
+		assertEquals("ethyl", identifiedNames.get(0).getChemicalName());
+		assertEquals("ethyl", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(5, identifiedNames.get(0).getEnd());
+
+		assertEquals("propyl", identifiedNames.get(1).getChemicalName());
+		assertEquals("propyl", identifiedNames.get(1).getTextValue());
+		assertEquals(NameType.part, identifiedNames.get(1).getNameType());
+		assertEquals(1, identifiedNames.get(1).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(1).getWordPositionEndIndice());
+		assertEquals(7, identifiedNames.get(1).getStart());
+		assertEquals(13, identifiedNames.get(1).getEnd());
+	}
 
 	@Test
 	public void nonChemicalButOpsinParsable1() throws Exception{
