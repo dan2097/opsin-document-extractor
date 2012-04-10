@@ -200,6 +200,13 @@ public class DocumentToStructures {
 				else{
 					adjustCurrentNameType(prr);
 				}
+				
+				if (currentNameType == NameType.part && chemicalNameBuffer.length() > 0 && chemicalNameBuffer.charAt(chemicalNameBuffer.length()-1)==','){
+					//works around a quirk that OPSIN accepts commas as intersubstituent delimiters but in free text these more likely indicate lists of substituents
+					chemicalNameBuffer = chemicalNameBuffer.deleteCharAt(chemicalNameBuffer.length()-1);
+					uninterpretedWordSection +=",";
+				}
+				
 				if (currentNameType == NameType.family || 
 						i +1==wordsLength ||
 						(uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) ) ||
