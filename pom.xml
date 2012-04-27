@@ -18,6 +18,12 @@
 			<url>http://www.opensource.org/licenses/artistic-license-2.0.php</url>
 		</license>
 	</licenses>
+	<repositories>
+	  <repository>
+	    <id>ucc</id>
+	    <url>https://maven.ch.cam.ac.uk/m2repo</url>
+	  </repository>
+	</repositories>
   <scm>
     <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
 		<connection>
