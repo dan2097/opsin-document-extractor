@@ -559,6 +559,19 @@ public class TestChemicalNameDetection {
 		assertEquals(0, identifiedNames.get(0).getStart());
 		assertEquals(7, identifiedNames.get(0).getEnd());
 	}
+	
+	@Test
+	public void testAdjacentNonNameInformation3() throws Exception{//" will become '' which can cause problems with lengths
+		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("benzene(\"Bn\")").extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("benzene", identifiedNames.get(0).getChemicalName());
+		assertEquals("benzene", identifiedNames.get(0).getTextValue());
+		assertEquals(NameType.complete, identifiedNames.get(0).getNameType());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(0, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(7, identifiedNames.get(0).getEnd());
+	}
 
 	@Test
 	public void testList() throws Exception{

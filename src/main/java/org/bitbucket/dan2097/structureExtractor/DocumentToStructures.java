@@ -128,7 +128,7 @@ public class DocumentToStructures {
 					String name =chemicalNameBuffer.toString();
 					int startWordIndice = i-(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int endWordIndice = i -1;
-					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, 0));
+					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, new String()));
 					chemicalNameBuffer = new StringBuilder();
 					currentNameType = null;
 				}
@@ -211,11 +211,11 @@ public class DocumentToStructures {
 						i +1==wordsLength ||
 						(uninterpretedWordSection.length()==1 && !Character.isLetterOrDigit(uninterpretedWordSection.charAt(0)) ) ||
 						fullWordImmediatelyFollowedByBracket(prr, uninterpretedWordSection) ||
-						fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonymn
+						fullOrFunctionalWordFollowedByBracket(prr, i)){//encountered punctuation or next word is likely to be irrelevant/a synonym
 					String name =chemicalNameBuffer.toString();
 					int startWordIndice = i + 1 -(matchWhiteSpace.split(name).length + spacesRemoved + totalSpacesRemoved);
 					int endWordIndice = i;
-					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, uninterpretedWordSection.length()));
+					identifiedChemicalNames.add(createIdentifiedName(name, startWordIndice, endWordIndice, uninterpretedWordSection));
 					chemicalNameBuffer = new StringBuilder();
 					currentNameType = null;
 					totalSpacesRemoved =0;
@@ -525,12 +525,12 @@ public class DocumentToStructures {
 	 * @param opsinChemicalName
 	 * @param startWordIndice
 	 * @param endWordIndice
-	 * @param lengthOfEndOfLastWordThatIsUnused 
+	 * @param uninterpretedWordSection 
 	 * @return
 	 */
-	private IdentifiedChemicalName createIdentifiedName(String opsinChemicalName, int startWordIndice, int endWordIndice, int lengthOfEndOfLastWordThatIsUnused) {
+	private IdentifiedChemicalName createIdentifiedName(String opsinChemicalName, int startWordIndice, int endWordIndice, String uninterpretedWordSection) {
 		String rawChemicalName = extractRawText(startWordIndice, endWordIndice);
-		rawChemicalName =rawChemicalName.substring(0, rawChemicalName.length()-lengthOfEndOfLastWordThatIsUnused);
+		rawChemicalName = determineRawName(rawChemicalName, uninterpretedWordSection);
 		int startingIndice = wordStartIndices.get(startWordIndice);
 		int frontBracketsRemoved = 0;
 		int endBracketsRemoved = 0;
@@ -599,6 +599,41 @@ public class DocumentToStructures {
 		}
 		int endingIndice = startingIndice + rawChemicalName.length();
 		return new IdentifiedChemicalName(startWordIndice, endWordIndice, startingIndice, endingIndice, opsinChemicalName, rawChemicalName, currentNameType);
+	}
+
+	/**
+	 * Need to take into account that the mapping between characters in the raw text and the OPSIN name won't necessarily be 1:1
+	 * The fact that OPSIN's preprocessor doesn't do any many --> 1 char conversion and that brackets are preserved is utilised
+	 * @param rawChemicalName
+	 * @param uninterpretedWordSection
+	 * @return
+	 */
+	private String determineRawName(String rawChemicalName, String uninterpretedWordSection) {
+		int lengthOfUninterpretableSection = uninterpretedWordSection.length();
+		if (lengthOfUninterpretableSection == 0){
+			return rawChemicalName;
+		}
+		else if (lengthOfUninterpretableSection == 1){
+			return rawChemicalName.substring(0, rawChemicalName.length() - 1);
+		}
+		else {
+			int openBracketCount = 0;
+			for (int i = 0; i < lengthOfUninterpretableSection; i++) {
+				if (isOpenBracket(uninterpretedWordSection.charAt(i))){
+					openBracketCount++;
+				}
+			}
+			int splitIndice = rawChemicalName.length()-1;
+			for (; splitIndice >=0; splitIndice--) {
+				if (isOpenBracket(rawChemicalName.charAt(splitIndice))){
+					openBracketCount--;
+					if (openBracketCount==0){
+						break;
+					}
+				}
+			}
+			return rawChemicalName.substring(0, splitIndice);
+		}
 	}
 
 	private String extractRawText(int startWordIndice, int endWordIndice) {
