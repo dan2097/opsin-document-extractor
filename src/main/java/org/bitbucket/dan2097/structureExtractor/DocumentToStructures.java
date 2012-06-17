@@ -204,7 +204,7 @@ public class DocumentToStructures {
 				if (currentNameType == NameType.part && chemicalNameBuffer.length() > 0 && chemicalNameBuffer.charAt(chemicalNameBuffer.length()-1)==','){
 					//works around a quirk that OPSIN accepts commas as intersubstituent delimiters but in free text these more likely indicate lists of substituents
 					chemicalNameBuffer = chemicalNameBuffer.deleteCharAt(chemicalNameBuffer.length()-1);
-					uninterpretedWordSection +=",";
+					uninterpretedWordSection = "," + uninterpretedWordSection;
 				}
 				
 				if (currentNameType == NameType.family || 
@@ -352,7 +352,7 @@ public class DocumentToStructures {
 	 */
 	private boolean periodicSpecialCase(String word, int i) {
 		if (word.equals("periodic") && i+1 < wordsLength){
-			String nextWord  = words[i+1];
+			String nextWord = words[i+1];
 			if (nextWord.equalsIgnoreCase("acid") || isFunctionalWord(getParses(nextWord))){
 				return true;
 			}
@@ -499,7 +499,7 @@ public class DocumentToStructures {
 
 	private int numberOfOpenbrackets(String name) {
 		int bracketLevel = 0;
-		int stringLength  = name.length();
+		int stringLength = name.length();
 		for(int i = 0 ; i < stringLength; i++) {
 			char c = name.charAt(i);
 			if(isOpenBracket(c)) {
@@ -616,6 +616,9 @@ public class DocumentToStructures {
 		else if (lengthOfUninterpretableSection == 1){
 			return rawChemicalName.substring(0, rawChemicalName.length() - 1);
 		}
+		else if (lengthOfUninterpretableSection == 2 && uninterpretedWordSection.charAt(0)==','){
+			return rawChemicalName.substring(0, rawChemicalName.length() - 2);
+		}
 		else {
 			int openBracketCount = 0;
 			for (int i = 0; i < lengthOfUninterpretableSection; i++) {
@@ -624,7 +627,7 @@ public class DocumentToStructures {
 				}
 			}
 			int splitIndice = rawChemicalName.length()-1;
-			for (; splitIndice >=0; splitIndice--) {
+			for (; splitIndice > 0; splitIndice--) {
 				if (isOpenBracket(rawChemicalName.charAt(splitIndice))){
 					openBracketCount--;
 					if (openBracketCount==0){
