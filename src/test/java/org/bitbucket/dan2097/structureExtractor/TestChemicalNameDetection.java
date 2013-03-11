@@ -232,7 +232,7 @@ public class TestChemicalNameDetection {
 	public void testPolymer2() throws Exception{
 		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures("poly ethylene").extractNames();
 		assertEquals(1, identifiedNames.size());
-		assertEquals("poly ethylene", identifiedNames.get(0).getChemicalName());
+		assertEquals("polyethylene", identifiedNames.get(0).getChemicalName());
 		assertEquals("poly ethylene", identifiedNames.get(0).getTextValue());
 		assertEquals(NameType.polymer, identifiedNames.get(0).getNameType());
 		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
