@@ -19,7 +19,7 @@ import uk.ac.cam.ch.wwmm.opsin.StringTools;
 public class DocumentToStructures {
 	
 	private static final Pattern matchWhiteSpace = Pattern.compile("\\s+");
-	private static final Pattern tokenPattern = Pattern.compile("[\\S]+");
+	private static final Pattern tokenPattern = Pattern.compile("[^\\s\\u00A0\u2007\u202F\u3000\u00AD\u200b\u200d\uFEFF][^\\s\\u00A0\u2007\u202F\u3000]*");
 	private static final char END_OF_MAINGROUP = '\u00e2';
 	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
 	private static final char END_OF_SUBSTITUENT = '\u00e9';

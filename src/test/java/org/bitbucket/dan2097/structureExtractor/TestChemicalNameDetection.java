@@ -1070,6 +1070,36 @@ public class TestChemicalNameDetection {
 	}
 	
 	@Test
+	public void testUnicodeWhitespace1() throws Exception {
+		//non breaking space --> " "
+		DocumentToStructures docToStruct = new DocumentToStructures("4-Octyloxyphenylboronic acid\u00A0 2a");
+		List<IdentifiedChemicalName> identifiedNames = docToStruct.extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("4-octyloxyphenylboronic acid", identifiedNames.get(0).getChemicalName());
+		assertEquals("4-Octyloxyphenylboronic acid", identifiedNames.get(0).getTextValue());
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		assertEquals(28, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
+	public void testUnicodeWhitespace2() throws Exception {
+		//soft hyphen --> ""
+		DocumentToStructures docToStruct = new DocumentToStructures("4-Octyloxyphenylboronic \u00AD acid 2a");
+		List<IdentifiedChemicalName> identifiedNames = docToStruct.extractNames();
+		assertEquals(1, identifiedNames.size());
+		assertEquals("4-octyloxyphenylboronic acid", identifiedNames.get(0).getChemicalName());
+
+		assertEquals(0, identifiedNames.get(0).getWordPositionStartIndice());
+		assertEquals(1, identifiedNames.get(0).getWordPositionEndIndice());
+		assertEquals(0, identifiedNames.get(0).getStart());
+		//FIXME currently all tokens are assumed to be separated by a single space!
+		//assertEquals("4-Octyloxyphenylboronic \u00AD acid", identifiedNames.get(0).getTextValue());
+		//assertEquals(30, identifiedNames.get(0).getEnd());
+	}
+
+	@Test
 	public void nonASCIIcharacters() throws Exception{
 		DocumentToStructures docToStruct = new DocumentToStructures("\u062A methane \u062Aethane propane\u062A");
 		List<IdentifiedChemicalName> identifiedNames = docToStruct.extractNames();
