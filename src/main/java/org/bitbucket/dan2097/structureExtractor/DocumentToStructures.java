@@ -14,7 +14,6 @@ import uk.ac.cam.ch.wwmm.opsin.OpsinPreProcessorWrapper;
 import uk.ac.cam.ch.wwmm.opsin.ParseRules;
 import uk.ac.cam.ch.wwmm.opsin.ParseRulesResults;
 import uk.ac.cam.ch.wwmm.opsin.ParseTokens;
-import uk.ac.cam.ch.wwmm.opsin.StringTools;
 
 public class DocumentToStructures {
 	
@@ -185,7 +184,7 @@ public class DocumentToStructures {
 				if (!chemicalNameBuffer.toString().equals("")){
 					chemicalNameBuffer.append(" ");
 				}
-				String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
+				String parsedOpsinNormalisedText =stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
 				chemicalNameBuffer.append(parsedOpsinNormalisedText);
 				if (parsedOpsinNormalisedText.indexOf(' ')!=-1){//both words were partially or fully interpreted
 					i++;
@@ -400,7 +399,7 @@ public class DocumentToStructures {
 		if (prr.getParseTokensList().size()==0){
 			return new SpaceRemovalResult(false, null, null, null);
 		}
-		String parsedOpsinNormalisedText =StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
+		String parsedOpsinNormalisedText = stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
 		String newParsedOpsinNormalisedText = parsedOpsinNormalisedText;
 		do {//join with subsequent words until either the chemical name is fully interpretable or the join does not increase the amount of interpretable name
 			if (indiceTojoin >=wordsLength){
@@ -412,7 +411,7 @@ public class DocumentToStructures {
 			if (prr.getParseTokensList().size()==0){
 				return new SpaceRemovalResult(false, null, null, null);
 			}
-			newParsedOpsinNormalisedText = StringTools.stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
+			newParsedOpsinNormalisedText = stringListToString(prr.getParseTokensList().get(0).getTokens(), "");
 			String uninterpretedWordSection = matchWhiteSpace.split(prr.getUninterpretableName())[0];
 			spacesRemoved++;
 			if (isEmptyStringOrSinglePunctuationCharacter(uninterpretedWordSection)){
@@ -422,6 +421,26 @@ public class DocumentToStructures {
 		}
 		while (newParsedOpsinNormalisedText.length()> parsedOpsinNormalisedText.length());
 		return new SpaceRemovalResult(false, null, null, null);
+	}
+	
+	/**
+	 * Converts a list of strings into a single string delimited by the given separator
+	 *
+	 * @param list A list of strings.
+	 * @param separator
+	 * @return The corresponding string.
+	 */
+	static String stringListToString(List<String> list, String separator) {
+		StringBuilder sb = new StringBuilder();
+		int lastIndexOfList = list.size() - 1;
+		for (int i = 0; i < lastIndexOfList; i++) {
+			sb.append(list.get(i));
+			sb.append(separator);
+		}
+		if (lastIndexOfList >= 0){
+			sb.append(list.get(lastIndexOfList));
+		}
+		return sb.toString();
 	}
 
 	private boolean fullWordImmediatelyFollowedByBracket(ParseRulesResults prr, String uninterpretedWordSection) {

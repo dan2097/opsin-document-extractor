@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.bitbucket.dan2097.structureExtractor;
 
 import uk.ac.cam.ch.wwmm.opsin.ParseRulesResults;
