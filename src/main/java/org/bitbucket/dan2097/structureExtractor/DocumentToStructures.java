@@ -22,7 +22,7 @@ public class DocumentToStructures {
 	private static final char END_OF_MAINGROUP = '\u00e2';
 	private static final char END_OF_FUNCTIONALTERM = '\u00FB';
 	private static final char END_OF_SUBSTITUENT = '\u00e9';
-	private static ParseRules pr;
+	private static final ParseRules pr;
 	/**These are words that are either interpreted erroneously as chemicals or have a nasty tendency to be interpreted as chemical when space removal is invoked*/
 	private static final Set<String> stopWords = new HashSet<String>(Arrays.asList("period", "periodic", "on", "one", "it", "at", "an", "in", "brine", "n2", "n2,", "o2", "o2,", "f2", "f2,", "cl2", "cl2,", "br2", "br2,", "i2", "i2,"));
 	
@@ -668,12 +668,13 @@ public class DocumentToStructures {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String input ="Pyridine and benzene are chemicals";
-		List<IdentifiedChemicalName> identifiedNames = new DocumentToStructures(input).extractNames();
-		for (IdentifiedChemicalName identifiedChemicalName : identifiedNames) {
-			System.out.println(identifiedChemicalName.getChemicalName());
-			System.out.println(identifiedChemicalName.getTextValue());
-			System.out.println(identifiedChemicalName.getNameType());
+		String input = "Pyridine and benzene are chemicals. ethylpyridines is a family of chemicals";
+		List<IdentifiedChemicalName> chemicalNames = new DocumentToStructures(input).extractNames();
+		for (IdentifiedChemicalName chemicalName : chemicalNames) {
+			System.out.println(chemicalName.getStart() + "\t" + chemicalName.getEnd());//Character offsets of start/end of chemical name
+			System.out.println(chemicalName.getTextValue());//The string of text between the start and the end of the chemical name
+			System.out.println(chemicalName.getChemicalName());//The chemical name after character/case normalization
+			System.out.println(chemicalName.getNameType());//The type of chemical name (complete/part/family/polymer)
 		}
 	}
 }
