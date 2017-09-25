@@ -12,8 +12,8 @@
   </properties>
   <licenses>
     <license>
-      <name>Artistic License 2.0</name>
-      <url>http://www.opensource.org/licenses/artistic-license-2.0.php</url>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
   <scm>
