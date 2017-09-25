@@ -1,82 +1,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>uk.ac.cam.ch.wwmm</groupId>
-    <artifactId>wwmm-parent</artifactId>
-    <version>4</version>
-  </parent>
-	<groupId>uk.ac.cam.ch.opsin</groupId>
-	<artifactId>opsin-document-extractor</artifactId>
-	<version>1.1-SNAPSHOT</version>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>uk.ac.cam.ch.opsin</groupId>
+  <artifactId>opsin-document-extractor</artifactId>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-	<name>OPSIN Document Extractor</name>
-	<description>Utilises OPSIN to perform brute force discovery of chemical names that are parsable by OPSIN</description>
+  <name>OPSIN Document Extractor</name>
+  <description>Utilises OPSIN to perform brute force discovery of chemical names that are parsable by OPSIN</description>
   <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
-	<licenses>
-		<license>
-			<name>Artistic License 2.0</name>
-			<url>http://www.opensource.org/licenses/artistic-license-2.0.php</url>
-		</license>
-	</licenses>
-	<repositories>
-	  <repository>
-	    <id>ucc</id>
-	    <url>https://maven.ch.cam.ac.uk/m2repo</url>
-	  </repository>
-	</repositories>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <licenses>
+    <license>
+      <name>Artistic License 2.0</name>
+      <url>http://www.opensource.org/licenses/artistic-license-2.0.php</url>
+    </license>
+  </licenses>
   <scm>
     <url>http://bitbucket.org/dan2097/opsin-document-extractor/</url>
-		<connection>
-			scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
-		</connection>
-		<developerConnection>
-			scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
-		</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<name>Daniel Lowe</name>
-			<email>dl387@cam.ac.uk</email>
-			<url>http://bitbucket.org/dan2097</url>
-			<organization>University of Cambridge</organization>
-			<organizationUrl>http://www.cam.ac.uk</organizationUrl>
-			<roles>
-			   <role>Lead Programmer</role>
-			</roles>
-		</developer>
-	</developers>
-  <distributionManagement>
-    <repository>
-      <id>ucc</id>
-      <url>https://maven.ch.cam.ac.uk/content/repositories/releases</url>
-    </repository>
-  </distributionManagement>
-	<dependencies>
-		<dependency>
-			<groupId>org.ccil.cowan.tagsoup</groupId>
-			<artifactId>tagsoup</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>uk.ac.cam.ch.opsin</groupId>
-			<artifactId>opsin-core</artifactId>
-			<version>1.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <connection>
+      scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
+    </connection>
+    <developerConnection>
+      scm:hg:http://bitbucket.org/dan2097/opsin-document-extractor
+    </developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <name>Daniel Lowe</name>
+      <url>http://bitbucket.org/dan2097</url>
+      <organization>University of Cambridge</organization>
+      <organizationUrl>http://www.cam.ac.uk</organizationUrl>
+      <roles>
+        <role>Lead Programmer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>uk.ac.cam.ch.opsin</groupId>
+      <artifactId>opsin-core</artifactId>
+      <version>2.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
