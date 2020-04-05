@@ -17,3 +17,5 @@ entity recognition for systematic chemical names.
 		System.out.println(chemicalName.getChemicalName());//The chemical name after character/case normalization
 		System.out.println(chemicalName.getNameType());//The type of chemical name (complete/part/family/polymer)
 	}
+
+[![Build Status](https://travis-ci.com/dan2097/opsin-document-extractor.svg?branch=master)](https://travis-ci.com/dan2097/opsin-document-extractor)
