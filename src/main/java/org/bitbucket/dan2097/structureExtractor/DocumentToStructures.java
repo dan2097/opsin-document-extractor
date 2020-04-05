@@ -62,7 +62,7 @@ public class DocumentToStructures {
 	 * A list of tokens not containing whitespace and not of zero length
 	 * The start/end token indices are calculated on the assumption of one space between each token
 	 * The word position indices are hence more likely to be applicable
-	 * @param words
+	 * @param tokens
 	 */
 	public DocumentToStructures(List<String> tokens) {
 		int indice =-1;//assume no starting space
